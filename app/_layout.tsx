@@ -1,10 +1,11 @@
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import * as NavigationBar from "expo-navigation-bar";
 import { useFonts } from "expo-font";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { InteractionManager, LogBox, View } from "react-native";
+import { AppState, InteractionManager, LogBox, Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -35,6 +36,7 @@ void SplashScreen.preventAutoHideAsync().catch(() => {});
 
 /** Matches `components/SplashScreen` so we never flash black while fonts load. */
 const FONT_LOADING_BG = "rgb(204, 245, 201)";
+const ANDROID_NAV_BAR_BG = "#FFFFFF";
 
 // Custom light theme configuration to override system settings
 const CustomLightTheme = {
@@ -65,6 +67,26 @@ export default function RootLayout() {
   });
 
   // Native splash is hidden from components/SplashScreen once the logo has painted.
+
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+
+    const applyNavigationBarStyle = () => {
+      void NavigationBar.setBackgroundColorAsync(ANDROID_NAV_BAR_BG).catch(() => {});
+      void NavigationBar.setButtonStyleAsync("dark").catch(() => {});
+    };
+
+    applyNavigationBarStyle();
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        applyNavigationBarStyle();
+      }
+    });
+
+    return () => {
+      sub.remove();
+    };
+  }, []);
 
   // Defer expo-notifications (large native module) until after fonts + first interactions.
   useEffect(() => {
