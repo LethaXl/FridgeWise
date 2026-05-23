@@ -30,7 +30,7 @@ const HEADER_HEIGHT = 320;
 export default function WelcomeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { signIn } = useAuth();
+  const { signIn, user, loading: authLoading } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
   const [loginSheetVisible, setLoginSheetVisible] = useState(false);
   const [email, setEmail] = useState("");
@@ -55,6 +55,12 @@ export default function WelcomeScreen() {
   const [resetEmailModalVisible, setResetEmailModalVisible] = useState(false);
   const [offlineNoticeVisible, setOfflineNoticeVisible] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace("/(tabs)");
+    }
+  }, [authLoading, router, user]);
 
   // 60-second cooldown timer after requesting password reset
   useEffect(() => {

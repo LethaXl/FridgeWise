@@ -474,7 +474,13 @@ export default function HomeScreen() {
     tone: ItemCardPendingTone;
   } | null>(null);
 
-  const name = firstNameForGreeting(userProfile?.full_name, user?.email);
+  const metadataFullName =
+    typeof user?.user_metadata?.full_name === "string"
+      ? user.user_metadata.full_name
+      : typeof user?.user_metadata?.name === "string"
+        ? user.user_metadata.name
+        : undefined;
+  const name = firstNameForGreeting(userProfile?.full_name ?? metadataFullName) ?? "there";
   const { width } = Dimensions.get("window");
   const pinnedStripInnerW = width - 36;
   const pinnedCardHalfW = Math.floor((pinnedStripInnerW - 8) / 2);
