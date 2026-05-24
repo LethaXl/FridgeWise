@@ -7,8 +7,8 @@ import { isSupabaseRecoveryLink } from "@/lib/supabaseRecoveryLink";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import * as ExpoSplashScreen from "expo-splash-screen";
-import { useEffect, useRef } from "react";
-import { View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Image, StyleSheet, View } from "react-native";
 
 const SPLASH_BACKGROUND = "rgb(204, 245, 201)";
 const INITIAL_URL_TIMEOUT_MS = 5000;
@@ -26,6 +26,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T
 export default function Index() {
   const router = useRouter();
   const { loading, session } = useAuth();
+  const [showFallback, setShowFallback] = useState(false);
   const navigatedRef = useRef(false);
   const sessionRef = useRef(session);
 
@@ -78,15 +79,7 @@ export default function Index() {
 
     const failsafe = setTimeout(() => {
       if (cancelled || navigatedRef.current) return;
-      navigatedRef.current = true;
-      const pending = peekPendingResetPasswordUrl();
-      if (pending && isSupabaseRecoveryLink(pending)) {
-        setPendingResetPasswordUrl(pending);
-        router.replace("/(auth)/reset-password" as never);
-      } else {
-        const activeSession = sessionRef.current;
-        router.replace((activeSession?.user ? "/(tabs)" : "/(auth)/welcome") as never);
-      }
+      setShowFallback(true);
       hideNativeSplash();
     }, SPLASH_FAILSAFE_MS);
 
@@ -96,5 +89,34 @@ export default function Index() {
     };
   }, [loading, router]);
 
-  return <View style={{ flex: 1, backgroundColor: SPLASH_BACKGROUND }} />;
+  return (
+    <View style={styles.container}>
+      {showFallback && (
+        <>
+          <Image
+            source={require("../assets/images/launchpng.png")}
+            style={styles.logo}
+            resizeMode="contain"
+            accessible
+            accessibilityLabel="FridgeWise logo"
+          />
+          <ActivityIndicator color="#15803D" size="small" />
+        </>
+      )}
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: SPLASH_BACKGROUND,
+  },
+  logo: {
+    width: "64%",
+    height: 180,
+    marginBottom: 16,
+  },
+});
