@@ -47,7 +47,7 @@ class ExactAlarmModule(private val reactContext: ReactApplicationContext) :
           )
         }
 
-      val activity = currentActivity
+      val activity = reactContext.currentActivity
       if (activity == null) {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         reactContext.startActivity(intent)
