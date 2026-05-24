@@ -29,6 +29,11 @@ import { CalendarProvider } from "@/contexts/CalendarContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { TipsProvider } from "@/contexts/TipsContext";
 import { foodItemsService } from "@/services/foodItems";
+import {
+  registerBackgroundTasks,
+  requestNotificationPermissions,
+  scheduleBackgroundTasks,
+} from "@/services/notificationService";
 import { setPendingResetPasswordUrl } from "@/lib/pendingResetUrl";
 import { isSupabaseRecoveryLink } from "@/lib/supabaseRecoveryLink";
 
@@ -95,16 +100,10 @@ export default function RootLayout() {
       void (async () => {
         try {
           // Warm per-item expiry notification module in the same idle window as
-          // notificationService so consume/delete does not pay a separate Metro fetch.
-          const [notifMod] = await Promise.all([
-            import("@/services/notificationService"),
+          // notification setup so consume/delete does not pay a separate Metro fetch.
+          await Promise.all([
             import("@/services/itemExpiryNotificationService"),
           ]);
-          const {
-            requestNotificationPermissions,
-            registerBackgroundTasks,
-            scheduleBackgroundTasks,
-          } = notifMod;
           await requestNotificationPermissions();
           await registerBackgroundTasks();
           await scheduleBackgroundTasks();
