@@ -1,13 +1,8 @@
 package com.aseef217.fridgewise
 import expo.modules.splashscreen.SplashScreenManager
 
-import android.app.AlarmManager
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
@@ -26,35 +21,6 @@ class MainActivity : ReactActivity() {
     SplashScreenManager.registerOnActivity(this)
     // @generated end expo-splashscreen
     super.onCreate(null)
-    requestExactAlarmAccessOnce()
-  }
-
-  private fun requestExactAlarmAccessOnce() {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-      return
-    }
-
-    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    if (alarmManager.canScheduleExactAlarms()) {
-      return
-    }
-
-    val prefs = getSharedPreferences("fridgewise_native_prefs", Context.MODE_PRIVATE)
-    if (prefs.getBoolean("requested_exact_alarm_access", false)) {
-      return
-    }
-
-    prefs.edit().putBoolean("requested_exact_alarm_access", true).apply()
-
-    try {
-      val intent = Intent(
-        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-        Uri.parse("package:$packageName")
-      )
-      startActivity(intent)
-    } catch (_: Exception) {
-      // If the settings screen is unavailable, Android will use inexact alarms.
-    }
   }
 
   /**

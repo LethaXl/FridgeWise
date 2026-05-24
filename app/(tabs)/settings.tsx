@@ -8,11 +8,17 @@ import {
   clearAllAppData,
   deleteUserAccount,
 } from "@/services/accountDataService";
+import {
+  canScheduleExactAlarms,
+  openExactAlarmSettings,
+} from "@/services/exactAlarmSettings";
 import { Ionicons } from "@expo/vector-icons";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
+  AppState,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -125,18 +131,33 @@ export default function SettingsScreen() {
     reloadSettingsFromStorage,
   } = useSettings();
   const { user } = useAuth();
-  const [showExportSoon, setShowExportSoon] = useState(false);
   const [dataBusy, setDataBusy] = useState<DataBusyOp>(false);
   const [dataModal, setDataModal] = useState<SettingsDataModal>(null);
+  const [exactAlarmAllowed, setExactAlarmAllowed] = useState<boolean | null>(null);
 
   const closeDataModal = useCallback(() => setDataModal(null), []);
   const anyDataBusy = dataBusy !== false;
 
+  const refreshExactAlarmStatus = useCallback(async () => {
+    if (Platform.OS !== "android") return;
+    const allowed = await canScheduleExactAlarms();
+    setExactAlarmAllowed(allowed);
+  }, []);
+
   useEffect(() => {
-    if (!showExportSoon) return;
-    const timer = setTimeout(() => setShowExportSoon(false), 2600);
-    return () => clearTimeout(timer);
-  }, [showExportSoon]);
+    void refreshExactAlarmStatus();
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") void refreshExactAlarmStatus();
+    });
+    return () => subscription.remove();
+  }, [refreshExactAlarmStatus]);
+
+  const openReminderAccuracySettings = useCallback(async () => {
+    await openExactAlarmSettings();
+    setTimeout(() => {
+      void refreshExactAlarmStatus();
+    }, 700);
+  }, [refreshExactAlarmStatus]);
 
   const runClearAllData = () => {
     if (!user?.id) {
@@ -341,6 +362,22 @@ export default function SettingsScreen() {
               primaryColor={primaryColor}
               subTextColor={subTextColor}
             />
+            {Platform.OS === "android" ? (
+              <>
+                <View style={styles.settingsSeparator} />
+                <ActionRow
+                  icon="alarm-outline"
+                  title="Reminder Accuracy"
+                  description={
+                    exactAlarmAllowed
+                      ? "Precise Android reminders are allowed"
+                      : "Optional: allow more precise reminder timing"
+                  }
+                  onPress={openReminderAccuracySettings}
+                  subTextColor={subTextColor}
+                />
+              </>
+            ) : null}
           </View>
 
           <View style={styles.sectionTitleWrap}>
@@ -352,34 +389,6 @@ export default function SettingsScreen() {
               { backgroundColor: cardBackgroundColor, borderColor: cardBorderColor },
             ]}
           >
-            <Pressable
-              onPress={() => setShowExportSoon((prev) => !prev)}
-              style={({ pressed }) => [styles.settingItem, pressed && styles.rowPressed]}
-            >
-              <View style={styles.settingIconContainer}>
-                <Ionicons name="download-outline" size={19} color="#16A34A" />
-              </View>
-              <View style={styles.settingContent}>
-                <ThemedText style={styles.settingTitle}>Export My Data</ThemedText>
-                <ThemedText style={[styles.settingDescription, { color: subTextColor }]}>
-                  Download a copy of your data
-                </ThemedText>
-              </View>
-              <Ionicons
-                name={showExportSoon ? "chevron-down" : "chevron-forward"}
-                size={18}
-                color="#16A34A"
-              />
-            </Pressable>
-            {showExportSoon ? (
-              <View style={styles.changeEmailSoonWrap}>
-                <View style={styles.changeEmailSoonSeparator} />
-                <View style={styles.changeEmailSoonPill}>
-                  <ThemedText style={styles.changeEmailSoonText}>Coming soon</ThemedText>
-                </View>
-              </View>
-            ) : null}
-            <View style={styles.settingsSeparator} />
             <Pressable
               onPress={runClearAllData}
               disabled={anyDataBusy}
@@ -538,30 +547,5 @@ const styles = StyleSheet.create({
   },
   rowDisabled: {
     opacity: 0.55,
-  },
-  changeEmailSoonWrap: {
-    width: "100%",
-    alignItems: "center",
-    marginTop: 0,
-    marginBottom: 8,
-  },
-  changeEmailSoonSeparator: {
-    width: "92%",
-    height: 1,
-    backgroundColor: "#F1F5F9",
-    marginBottom: 8,
-  },
-  changeEmailSoonPill: {
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-    backgroundColor: "#F3F4F6",
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-  },
-  changeEmailSoonText: {
-    fontSize: 11,
-    color: "#4B5563",
-    fontWeight: "600",
   },
 });
