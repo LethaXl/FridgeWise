@@ -62,6 +62,7 @@ import {
   isOfflineLikeError,
 } from "@/utils/networkError";
 import { firstNameForGreeting } from "@/utils/personNameInput";
+import { waitForSupabaseSessionUser } from "@/utils/waitForSupabaseSession";
 
 type LocationFilter = "all" | "fridge" | "shelf";
 
@@ -280,7 +281,7 @@ function CardRow({
 }
 
 export default function HomeScreen() {
-  const { user, userProfile, getUserProfile } = useAuth();
+  const { user, userProfile, getUserProfile, loading: authLoading } = useAuth();
   const insets = useSafeAreaInsets();
 
   const [items, setItems] = useState<FoodItem[]>([]);
@@ -288,6 +289,9 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const hasLoadedOnceRef = useRef(false);
   const lastLoadedAtRef = useRef(0);
+  const prevUserIdRef = useRef<string | undefined>(user?.id);
+  const authLoadRetryCountRef = useRef(0);
+  const homeLoadGenerationRef = useRef(0);
 
   const [locationFilter, setLocationFilter] = useState<LocationFilter>("fridge");
   const [inventoryToggleWidth, setInventoryToggleWidth] = useState(0);
@@ -494,6 +498,22 @@ export default function HomeScreen() {
     Alert.alert("Error", getErrorMessage(error) || fallback);
   }, [user?.id]);
 
+  useEffect(() => {
+    if (prevUserIdRef.current !== user?.id) {
+      prevUserIdRef.current = user?.id;
+      hasLoadedOnceRef.current = false;
+      lastLoadedAtRef.current = 0;
+      authLoadRetryCountRef.current = 0;
+      homeLoadGenerationRef.current += 1;
+      setItems([]);
+      setThisWeekExpiring([]);
+      setThisWeekExpired([]);
+      setThisWeekLogs([]);
+      setHistoryTotals(null);
+      setPinnedIds([]);
+    }
+  }, [user?.id]);
+
   const loadHistoryTotals = useCallback(async (options?: { force?: boolean }) => {
     if (!user?.id) return;
     try {
@@ -608,18 +628,37 @@ export default function HomeScreen() {
 
   const loadItems = useCallback(async (options?: { showLoader?: boolean }) => {
     const showLoader = options?.showLoader ?? true;
+    if (!user?.id) return false;
+    const loadGeneration = homeLoadGenerationRef.current;
     try {
       if (showLoader) setLoading(true);
+      const authReady = await waitForSupabaseSessionUser(user.id);
+      if (!authReady) {
+        if (authLoadRetryCountRef.current < 2) {
+          authLoadRetryCountRef.current += 1;
+          setTimeout(() => {
+            if (homeLoadGenerationRef.current === loadGeneration) {
+              void loadItems({ showLoader });
+            }
+          }, 350);
+        } else if (showLoader) {
+          setHomeMetaLoading(false);
+        }
+        return false;
+      }
+      authLoadRetryCountRef.current = 0;
       const data = await foodItemsService.getItems();
       setItems(data);
       lastLoadedAtRef.current = Date.now();
-      if (showLoader && user?.id) {
+      if (showLoader) {
         const pinned = await loadPinnedItemIds(user.id);
         setPinnedIds(pinned);
       }
       await loadHomeMeta({ showLoading: showLoader, itemsSource: data as FoodItem[] });
+      return true;
     } catch (error: any) {
       showActionError(error, "Failed to load items");
+      return false;
     } finally {
       if (showLoader) setLoading(false);
     }
@@ -627,15 +666,19 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (!user) {
+      if (authLoading) return;
+      if (!user?.id) {
         router.replace({ pathname: "/(auth)/welcome" });
         return;
       }
       // Always refresh on focus so Expired/Recent labels stay current.
-      loadItems({ showLoader: !hasLoadedOnceRef.current });
-      hasLoadedOnceRef.current = true;
+      void loadItems({ showLoader: !hasLoadedOnceRef.current }).then((loaded) => {
+        if (loaded) {
+          hasLoadedOnceRef.current = true;
+        }
+      });
       if (!userProfile) getUserProfile();
-    }, [user, userProfile, getUserProfile, loadItems])
+    }, [authLoading, user?.id, userProfile, getUserProfile, loadItems])
   );
 
   useEffect(() => {

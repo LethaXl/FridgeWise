@@ -40,7 +40,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 /** Cold-start auth can be slow after device sleep, but startup should not block indefinitely. */
-const AUTH_INIT_TIMEOUT_MS = 12_000;
+const AUTH_INIT_TIMEOUT_MS = 3_500;
+const AUTH_INIT_RETRY_TIMEOUT_MS = 1_500;
 
 /** Stale or revoked refresh token in local storage — clear session instead of surfacing a red error loop. */
 function isRefreshTokenDeadError(err: { message?: string; code?: string } | null): boolean {
@@ -168,14 +169,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           session = await readSessionWithinTimeout(AUTH_INIT_TIMEOUT_MS);
         } catch {
           // One retry after cold start / slow DNS (common after long idle on Android).
-          await new Promise((r) => setTimeout(r, 500));
-          session = await readSessionWithinTimeout(AUTH_INIT_TIMEOUT_MS);
+          await new Promise((r) => setTimeout(r, 250));
+          session = await readSessionWithinTimeout(AUTH_INIT_RETRY_TIMEOUT_MS);
         }
 
         const rememberRaw = await Promise.race([
           AsyncStorage.getItem(REMEMBER_ME_STORAGE_KEY),
           new Promise<string | null>((resolve) =>
-            setTimeout(() => resolve(null), AUTH_INIT_TIMEOUT_MS)
+            setTimeout(() => resolve(null), AUTH_INIT_RETRY_TIMEOUT_MS)
           ),
         ]);
 
@@ -235,12 +236,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ) => {
     try {
       const rememberMe = options?.rememberMe !== false;
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       if (error) throw error;
-      await setRememberMePreference(rememberMe);
+
+      setSession(data.session ?? null);
+      setUser(data.user ?? data.session?.user ?? null);
+      setLoading(false);
+
+      const signedInUser = data.user ?? data.session?.user ?? null;
+      if (signedInUser) {
+        void fetchUserProfileById(signedInUser.id)
+          .then((profile) => {
+            setUserProfile(profile);
+          })
+          .catch(() => {});
+      }
+
+      await Promise.race([
+        setRememberMePreference(rememberMe),
+        new Promise<void>((resolve) => setTimeout(resolve, 3000)),
+      ]);
     } catch (error: any) {
       throw error;
     }
