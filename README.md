@@ -1,132 +1,112 @@
+<h1 align="center">FridgeWise</h1>
+
 <p align="center">
-  <img src="https://github.com/arjya12/fridgewise/blob/879b97162eb277c0e224c68141dddec544da5249/Screenshot_1757475399.png" alt="FridgeWise logo" width="96" />
+  A mobile app for tracking food items, expiry dates, and grocery lists.
 </p>
-<h2 align="center">FridgeWise — Smart Food Inventory & Expiry Tracking</h2>
-<p align="center">Turn your kitchen notes into organized lists, timely reminders, and less waste.</p>
 
 ---
+
+## Overview
+
+FridgeWise helps users manage the food they already have at home. It keeps food items, expiry dates, notifications, and grocery planning in one app, so users can see what they have, what needs attention, and what they may need to buy next.
+
+The app is designed around everyday kitchen tasks: adding food items, checking upcoming expiries, updating item status, setting notifications, and reviewing basic food usage reports.
+
+## Screenshots
 
 <table>
-<tr>
-<td><img src="https://github.com/arjya12/fridgewise/blob/879b97162eb277c0e224c68141dddec544da5249/Screenshot_1757475409.png" alt="Welcome screen" width="200" /></td>
-<td><img src="https://github.com/arjya12/fridgewise/blob/879b97162eb277c0e224c68141dddec544da5249/Screenshot_1757475424.png" alt="Create Account" width="200" /></td>
-<td><img src="https://github.com/arjya12/fridgewise/blob/879b97162eb277c0e224c68141dddec544da5249/Screenshot_1757475437.png" alt="Sign In" width="200" /></td>
-</tr>
-<tr>
-<td><img src="https://github.com/arjya12/fridgewise/blob/879b97162eb277c0e224c68141dddec544da5249/Screenshot_1757475457.png" alt="Home Dashboard" width="200" /></td>
-<td><img src="https://github.com/arjya12/fridgewise/blob/22c46c096fcb4593c4e7bdd73043f4a8a2995122/Screenshot_1757475463.png" alt="Food Expiry Calendar" width="200" /></td>
-<td><img src="https://github.com/arjya12/fridgewise/blob/879b97162eb277c0e224c68141dddec544da5249/Screenshot_1757475466.png" alt="Shopping List" width="200" /></td>
-</tr>
-<tr>
-<td colspan="3"><img src="https://github.com/arjya12/fridgewise/blob/879b97162eb277c0e224c68141dddec544da5249/Screenshot_1757475468.png" alt="More / Profile" width="200" /></td>
-</tr>
+  <tr>
+    <td align="center">
+      <img src="./assets/readme/Welcome.jpeg" alt="Welcome screen" width="200" />
+      <br />
+      <sub>Welcome</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/readme/Create-Account.jpeg" alt="Create account screen" width="200" />
+      <br />
+      <sub>Create Account</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/readme/Home.jpeg" alt="Home screen" width="200" />
+      <br />
+      <sub>Home</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="./assets/readme/Add-Item.jpeg" alt="Add item screen" width="200" />
+      <br />
+      <sub>Add Item</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/readme/Calendar.jpeg" alt="Calendar screen" width="200" />
+      <br />
+      <sub>Calendar</sub>
+    </td>
+    <td></td>
+  </tr>
 </table>
 
----
+## Features
 
-### Overview / Introduction
+### Food Tracking
 
-FridgeWise helps households and meal preppers track food inventory across fridge, freezer, and pantry. It scans barcodes, predicts expiry windows, sends timely notifications, and provides insights to reduce waste and optimize shopping. Built with Expo and React Native, it runs on iOS, Android, and the web.
+- Add food items with quantity, expiry date, location, and reminder settings
+- Track fridge and shelf items separately
+- Edit item details when something changes
+- Mark items as consumed or thrown away
+- Extend expiry dates when needed
 
----
+### Expiry Notifications
 
-### Features
+- View upcoming expiries in weekly and calendar views
+- Set custom reminder times and repeat options
+- Schedule local notifications for food items
 
-- Barcode scanning via camera to auto-fill item details
-- Smart expiry tracking with extend/consume actions and swipe gestures
-- Rich calendar views (day/week/month) and upcoming-expiry lists
-- Batch selection and quick actions for power users
-- Local notifications with customizable preferences
-- Inventory analytics, waste insights, and achievement system
-- Offline-ready storage and sync with Supabase backend
-- Accessible UI with dark mode and responsive layouts
-- Cross-platform support (iOS, Android, Web) using Expo
+### Grocery List
 
----
+- Keep a grocery list separate from current inventory
+- Add grocery items as needed
 
-### Tech Stack
+### Reports and Account
 
-- Core: TypeScript, React 19, React Native 0.79, Expo 53, Expo Router 5
-- Navigation: React Navigation 7
-- UI/UX: Reanimated 3, React Native Gesture Handler 2, react-native-safe-area-context
-- Device & OS: expo-camera, expo-image, expo-notifications, expo-splash-screen, expo-linking
-- Data & Networking: Supabase JS, AsyncStorage, Axios
-- Tooling: Metro bundler, ESLint (Expo config), Jest + jest-expo, React Native Testing Library
-- Build & Distribution: EAS Build/Submit
+- Review consumption and waste reports
+- Sign in with Supabase authentication
+- Manage password, app data, and account deletion from settings
 
----
+## Tech Stack
 
-### Installation / Setup Instructions
+| Area | Technology |
+| --- | --- |
+| Mobile app | React Native, Expo |
+| Language | TypeScript |
+| Backend and auth | Supabase |
+| Email | SendGrid |
+| Testing | Jest |
 
-Prerequisites:
+## Database
 
-- Node.js 18+ and npm 9+
-- Git
-- Expo CLI (recommended):
+The app uses Supabase for backend data and authentication. Database schema details are available on request.
 
-```bash
-npm i -g expo
-```
+## Getting Started
 
-- For native testing:
-  - Android Studio (Android SDK + emulator)
-  - Xcode (iOS simulator) on macOS
-
-1. Clone the repository
-
-```bash
-git clone <your-fork-or-origin-url> fridgewise
-cd fridgewise
-```
-
-2. Install dependencies
+Install dependencies:
 
 ```bash
 npm install
-# or for clean CI-like installs
-npm ci
 ```
 
-3. Configure environment variables
-
-Expo loads `.env` by default. Create a `.env` file in the project root:
+Create a `.env` file in the project root:
 
 ```bash
-cp .env.example .env # If you have an example file
-# Otherwise, create it manually:
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
+EXPO_PUBLIC_RESET_REDIRECT_URL=
+EXPO_PUBLIC_RESET_WEB_REDIRECT_URL=
 ```
 
-```bash
-# .env
-EXPO_PUBLIC_SUPABASE_URL=<your-supabase-url>
-EXPO_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
-```
-
-4. Start the development server
+Start the development server:
 
 ```bash
 npm run start
 ```
-
-Then:
-
-- Press `a` for Android, `i` for iOS (macOS), or `w` for web.
-- Or open Expo Go on your device and scan the QR code.
-
-Optional shortcuts:
-
-```bash
-npm run android
-npm run ios
-npm run web
-```
-
----
-
-### Usage
-
-- Authentication: Sign in/up (Supabase) from the auth screens.
-- Add items: Use the "Add Item" flow or scan a barcode to autofill.
-- Manage inventory: Swipe cards to extend expiry, consume, or move locations.
-- Calendar: View upcoming expiries in calendar views and 7‑day summaries.
-- Notifications: Enable push permissions and configure preferences in settings.
