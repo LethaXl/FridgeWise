@@ -1,14 +1,14 @@
 <h1 align="center">FridgeWise</h1>
 
 <p align="center">
-  A mobile app for tracking food items, expiry dates, and grocery lists.
+  A cross-platform mobile app for tracking food items, expiry notifications, and grocery lists.
 </p>
 
 ---
 
 ## Overview
 
-FridgeWise helps users manage the food they already have at home. It keeps food items, expiry dates, notifications, and grocery planning in one app, so users can see what they have, what needs attention, and what they may need to buy next.
+FridgeWise helps users manage the food they already have at home and reduce waste from forgotten items. It keeps food items, expiry dates, notifications, and grocery planning in one app, so users can see what they have, what needs attention, and what they may need to buy next.
 
 The app is designed around everyday kitchen tasks: adding food items, checking upcoming expiries, updating item status, setting notifications, and reviewing basic food usage reports.
 
