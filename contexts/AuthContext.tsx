@@ -39,8 +39,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-/** Cold-start `getSession()` can exceed a few seconds (network, token refresh, device wake). */
-const AUTH_INIT_TIMEOUT_MS = 28_000;
+/** Cold-start auth can be slow after device sleep, but startup should not block indefinitely. */
+const AUTH_INIT_TIMEOUT_MS = 12_000;
 
 /** Stale or revoked refresh token in local storage — clear session instead of surfacing a red error loop. */
 function isRefreshTokenDeadError(err: { message?: string; code?: string } | null): boolean {

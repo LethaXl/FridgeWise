@@ -18,7 +18,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 
 export default function CalendarScreen() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { refresh, markItemUsed, state } = useCalendar();
   const hasRefreshedOnceRef = useRef(false);
   const lastRefreshAtRef = useRef(0);
@@ -30,6 +30,8 @@ export default function CalendarScreen() {
     if (prevUserIdRef.current !== user?.id) {
       prevUserIdRef.current = user?.id;
       calendarHydratedRef.current = false;
+      hasRefreshedOnceRef.current = false;
+      lastRefreshAtRef.current = 0;
     }
   }, [user?.id]);
 
@@ -102,6 +104,7 @@ export default function CalendarScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      if (authLoading || !user?.id) return;
       const now = Date.now();
       const hasFreshData = state.items.length > 0 && now - lastRefreshAtRef.current < 30_000;
       if (hasRefreshedOnceRef.current && hasFreshData) return;
@@ -109,7 +112,7 @@ export default function CalendarScreen() {
       refresh().finally(() => {
         lastRefreshAtRef.current = Date.now();
       });
-    }, [refresh, state.items.length])
+    }, [authLoading, refresh, state.items.length, user?.id])
   );
 
   const handleItemPress = useCallback((item: any) => {
