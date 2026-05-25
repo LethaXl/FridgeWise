@@ -14,36 +14,38 @@ The app is designed around everyday kitchen tasks: adding food items, checking u
 
 ## Screenshots
 
-<table>
+<table align="center">
   <tr>
     <td align="center">
-      <img src="./assets/readme/Welcome.jpeg" alt="Welcome screen" width="200" />
+      <img src="./assets/readme/Welcome.jpeg" alt="Welcome screen" width="170" />
       <br />
       <sub>Welcome</sub>
     </td>
     <td align="center">
-      <img src="./assets/readme/Create-Account.jpeg" alt="Create account screen" width="200" />
+      <img src="./assets/readme/Create-Account.jpeg" alt="Create account screen" width="170" />
       <br />
       <sub>Create Account</sub>
     </td>
     <td align="center">
-      <img src="./assets/readme/Home.jpeg" alt="Home screen" width="200" />
+      <img src="./assets/readme/Home.jpeg" alt="Home screen" width="170" />
       <br />
       <sub>Home</sub>
     </td>
   </tr>
+</table>
+
+<table align="center">
   <tr>
     <td align="center">
-      <img src="./assets/readme/Add-Item.jpeg" alt="Add item screen" width="200" />
+      <img src="./assets/readme/Add-Item.jpeg" alt="Add item screen" width="170" />
       <br />
       <sub>Add Item</sub>
     </td>
     <td align="center">
-      <img src="./assets/readme/Calendar.jpeg" alt="Calendar screen" width="200" />
+      <img src="./assets/readme/Calendar.jpeg" alt="Calendar screen" width="170" />
       <br />
       <sub>Calendar</sub>
     </td>
-    <td></td>
   </tr>
 </table>
 
