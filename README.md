@@ -19,17 +19,17 @@ The app is designed around everyday kitchen tasks: adding food items, checking u
     <td align="center">
       <img src="./assets/readme/Welcome.jpeg" alt="Welcome screen" width="170" />
       <br />
-      <sub>Welcome</sub>
+      <strong>Welcome screen</strong>
     </td>
     <td align="center">
       <img src="./assets/readme/Create-Account.jpeg" alt="Create account screen" width="170" />
       <br />
-      <sub>Create Account</sub>
+      <strong>Create account</strong>
     </td>
     <td align="center">
       <img src="./assets/readme/Home.jpeg" alt="Home screen" width="170" />
       <br />
-      <sub>Home</sub>
+      <strong>Home dashboard</strong>
     </td>
   </tr>
 </table>
@@ -39,12 +39,12 @@ The app is designed around everyday kitchen tasks: adding food items, checking u
     <td align="center">
       <img src="./assets/readme/Add-Item.jpeg" alt="Add item screen" width="170" />
       <br />
-      <sub>Add Item</sub>
+      <strong>Add item screen</strong>
     </td>
     <td align="center">
       <img src="./assets/readme/Calendar.jpeg" alt="Calendar screen" width="170" />
       <br />
-      <sub>Calendar</sub>
+      <strong>Calendar view</strong>
     </td>
   </tr>
 </table>
