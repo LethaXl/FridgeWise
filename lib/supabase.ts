@@ -88,8 +88,6 @@ const fetchWithRetry: typeof fetch = async (input, init) => {
   throw lastError;
 };
 
-// RN AsyncStorage can occasionally deadlock/hang under concurrent access.
-// Wrap it to (1) serialize operations and (2) emit timings for debugging.
 type StorageLike = {
   getItem: (key: string) => Promise<string | null>;
   setItem: (key: string, value: string) => Promise<void>;
@@ -143,60 +141,7 @@ function getAsyncStorageOrFallback(): StorageLike {
   return createMemoryStorage();
 }
 
-const AsyncStorage = getAsyncStorageOrFallback();
-const STORAGE_OP_TIMEOUT_MS = 7_000;
-
-function withStorageTimeout<T>(
-  promise: Promise<T>,
-  ms: number,
-  opName: string,
-  key: string
-): Promise<T> {
-  let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  const timeout = new Promise<never>((_, reject) => {
-    timeoutId = setTimeout(() => {
-      reject(new Error(`storage-${opName}-timeout:${key}`));
-    }, ms);
-  });
-
-  return Promise.race([promise, timeout]).finally(() => {
-    if (timeoutId) clearTimeout(timeoutId);
-  });
-}
-
-const createSerializedStorage = () => {
-  let chain: Promise<unknown> = Promise.resolve();
-  const enqueue = <T,>(opName: string, key: string, fn: () => Promise<T>) => {
-    const safeKey = key.startsWith("sb-") ? "sb-..." : key;
-    const run = async () => {
-      try {
-        const result = await withStorageTimeout(
-          fn(),
-          STORAGE_OP_TIMEOUT_MS,
-          opName,
-          safeKey
-        );
-        return result;
-      } catch (e: any) {
-        throw e;
-      }
-    };
-    const p = chain.then(run, run);
-    // keep chain alive but don't leak typed errors into it
-    chain = p.catch(() => undefined);
-    return p;
-  };
-
-  return {
-    getItem: (key: string) => enqueue("getItem", key, () => AsyncStorage.getItem(key)),
-    setItem: (key: string, value: string) =>
-      enqueue("setItem", key, () => AsyncStorage.setItem(key, value)),
-    removeItem: (key: string) =>
-      enqueue("removeItem", key, () => AsyncStorage.removeItem(key)),
-  };
-};
-
-const supabaseStorage = createSerializedStorage();
+const supabaseStorage = getAsyncStorageOrFallback();
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {

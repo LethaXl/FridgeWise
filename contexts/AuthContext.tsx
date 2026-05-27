@@ -40,8 +40,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 /** Cold-start auth can be slow after device sleep, but startup should not block indefinitely. */
-const AUTH_INIT_TIMEOUT_MS = 3_500;
-const AUTH_INIT_RETRY_TIMEOUT_MS = 1_500;
+const AUTH_INIT_TIMEOUT_MS = 10_000;
+const AUTH_INIT_RETRY_DELAY_MS = 1_000;
+const REMEMBER_ME_READ_TIMEOUT_MS = 2_000;
 
 /** Stale or revoked refresh token in local storage — clear session instead of surfacing a red error loop. */
 function isRefreshTokenDeadError(err: { message?: string; code?: string } | null): boolean {
@@ -105,6 +106,14 @@ function readSessionWithinTimeout(ms: number): Promise<Session | null> {
   ]);
 }
 
+function isAuthInitTimeoutError(error: unknown): boolean {
+  return error instanceof Error && error.message === "auth-init-timeout";
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -163,47 +172,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
 
     const init = async () => {
-      try {
-        let session: Session | null = null;
+      while (!cancelled) {
         try {
-          session = await readSessionWithinTimeout(AUTH_INIT_TIMEOUT_MS);
-        } catch {
-          // One retry after cold start / slow DNS (common after long idle on Android).
-          await new Promise((r) => setTimeout(r, 250));
-          session = await readSessionWithinTimeout(AUTH_INIT_RETRY_TIMEOUT_MS);
+          let session = await readSessionWithinTimeout(AUTH_INIT_TIMEOUT_MS);
+
+          const rememberRaw = await Promise.race([
+            AsyncStorage.getItem(REMEMBER_ME_STORAGE_KEY),
+            new Promise<string | null>((resolve) =>
+              setTimeout(() => resolve(null), REMEMBER_ME_READ_TIMEOUT_MS)
+            ),
+          ]);
+
+          if (session && rememberRaw === "false") {
+            await supabase.auth.signOut();
+            session = await readSessionOrClearStaleAuth();
+          }
+
+          if (cancelled) return;
+
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+
+          if (session?.user) {
+            void fetchUserProfileById(session.user.id).then((profile) => {
+              if (!cancelled) setUserProfile(profile);
+            });
+          }
+          return;
+        } catch (error) {
+          if (cancelled) return;
+          if (!isAuthInitTimeoutError(error)) {
+            if (__DEV__) {
+              console.warn("Auth init failed");
+            }
+            setSession(null);
+            setUser(null);
+            setLoading(false);
+            return;
+          }
+          if (__DEV__) {
+            console.warn("Auth init timed out; retrying");
+          }
+          await delay(AUTH_INIT_RETRY_DELAY_MS);
         }
-
-        const rememberRaw = await Promise.race([
-          AsyncStorage.getItem(REMEMBER_ME_STORAGE_KEY),
-          new Promise<string | null>((resolve) =>
-            setTimeout(() => resolve(null), AUTH_INIT_RETRY_TIMEOUT_MS)
-          ),
-        ]);
-
-        if (session && rememberRaw === "false") {
-          await supabase.auth.signOut();
-          session = await readSessionOrClearStaleAuth();
-        }
-
-        if (cancelled) return;
-
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-
-        if (session?.user) {
-          void fetchUserProfileById(session.user.id).then((profile) => {
-            if (!cancelled) setUserProfile(profile);
-          });
-        }
-      } catch {
-        if (cancelled) return;
-        if (__DEV__) {
-          console.warn("Auth init failed or timed out");
-        }
-        setSession(null);
-        setUser(null);
-        setLoading(false);
       }
     };
 

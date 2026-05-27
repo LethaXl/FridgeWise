@@ -62,7 +62,6 @@ import {
   isOfflineLikeError,
 } from "@/utils/networkError";
 import { firstNameForGreeting } from "@/utils/personNameInput";
-import { waitForSupabaseSessionUser } from "@/utils/waitForSupabaseSession";
 
 type LocationFilter = "all" | "fridge" | "shelf";
 
@@ -290,7 +289,6 @@ export default function HomeScreen() {
   const hasLoadedOnceRef = useRef(false);
   const lastLoadedAtRef = useRef(0);
   const prevUserIdRef = useRef<string | undefined>(user?.id);
-  const authLoadRetryCountRef = useRef(0);
   const homeLoadGenerationRef = useRef(0);
 
   const [locationFilter, setLocationFilter] = useState<LocationFilter>("fridge");
@@ -503,7 +501,6 @@ export default function HomeScreen() {
       prevUserIdRef.current = user?.id;
       hasLoadedOnceRef.current = false;
       lastLoadedAtRef.current = 0;
-      authLoadRetryCountRef.current = 0;
       homeLoadGenerationRef.current += 1;
       setItems([]);
       setThisWeekExpiring([]);
@@ -632,22 +629,8 @@ export default function HomeScreen() {
     const loadGeneration = homeLoadGenerationRef.current;
     try {
       if (showLoader) setLoading(true);
-      const authReady = await waitForSupabaseSessionUser(user.id);
-      if (!authReady) {
-        if (authLoadRetryCountRef.current < 2) {
-          authLoadRetryCountRef.current += 1;
-          setTimeout(() => {
-            if (homeLoadGenerationRef.current === loadGeneration) {
-              void loadItems({ showLoader });
-            }
-          }, 350);
-        } else if (showLoader) {
-          setHomeMetaLoading(false);
-        }
-        return false;
-      }
-      authLoadRetryCountRef.current = 0;
       const data = await foodItemsService.getItems();
+      if (homeLoadGenerationRef.current !== loadGeneration) return false;
       setItems(data);
       lastLoadedAtRef.current = Date.now();
       if (showLoader) {

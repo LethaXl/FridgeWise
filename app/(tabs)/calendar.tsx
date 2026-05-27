@@ -13,7 +13,6 @@ import {
   getErrorMessage,
   isOfflineLikeError,
 } from "@/utils/networkError";
-import { waitForSupabaseSessionUser } from "@/utils/waitForSupabaseSession";
 import { router, useFocusEffect, useGlobalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
@@ -23,7 +22,6 @@ export default function CalendarScreen() {
   const { refresh, markItemUsed, state } = useCalendar();
   const hasRefreshedOnceRef = useRef(false);
   const lastRefreshAtRef = useRef(0);
-  const authRefreshRetryCountRef = useRef(0);
   /** After first completed fetch, keep calendar mounted so empty + refresh does not unmount/remount loop */
   const calendarHydratedRef = useRef(false);
   const prevUserIdRef = useRef<string | undefined>(user?.id);
@@ -34,7 +32,6 @@ export default function CalendarScreen() {
       calendarHydratedRef.current = false;
       hasRefreshedOnceRef.current = false;
       lastRefreshAtRef.current = 0;
-      authRefreshRetryCountRef.current = 0;
     }
   }, [user?.id]);
 
@@ -112,32 +109,18 @@ export default function CalendarScreen() {
       const hasFreshData = state.items.length > 0 && now - lastRefreshAtRef.current < 30_000;
       if (hasRefreshedOnceRef.current && hasFreshData) return;
       let cancelled = false;
-      let retryTimer: ReturnType<typeof setTimeout> | null = null;
 
-      const runRefreshWhenReady = async () => {
-        const authReady = await waitForSupabaseSessionUser(user.id);
-        if (cancelled) return;
-        if (!authReady) {
-          if (authRefreshRetryCountRef.current < 2) {
-            authRefreshRetryCountRef.current += 1;
-            retryTimer = setTimeout(() => {
-              void runRefreshWhenReady();
-            }, 350);
-          }
-          return;
-        }
-        authRefreshRetryCountRef.current = 0;
+      const runRefresh = async () => {
         await refresh();
         if (cancelled) return;
         hasRefreshedOnceRef.current = true;
         lastRefreshAtRef.current = Date.now();
       };
 
-      void runRefreshWhenReady();
+      void runRefresh();
 
       return () => {
         cancelled = true;
-        if (retryTimer) clearTimeout(retryTimer);
       };
     }, [authLoading, refresh, state.items.length, user?.id])
   );
