@@ -38,6 +38,7 @@ import {
   MAX_INVENTORY_QUANTITY,
   sanitizeQuantityInputString,
 } from "@/utils/quantityLimits";
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 
 // =============================================================================
 // INTERFACES
@@ -102,6 +103,7 @@ export default function ShoppingListScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const swipeRefs = useRef<Record<string, Swipeable | null>>({});
   const [addOpen, setAddOpen] = useState(false);
+  useModalNavigationBar(addOpen);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [collapsedCategories, setCollapsedCategories] = useState<
     Record<string, boolean>

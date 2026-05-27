@@ -61,6 +61,7 @@ import {
   isNetworkRequestFailed,
   isOfflineLikeError,
 } from "@/utils/networkError";
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 
 const commonUnits = [
   // most used (quick picks)
@@ -252,6 +253,7 @@ export default function AddItemScreen() {
   );
   const [showNotificationTimePicker, setShowNotificationTimePicker] =
     useState(false);
+  useModalNavigationBar(showNotificationTimePicker);
   const [reminderMenuOpen, setReminderMenuOpen] = useState(false);
   const [customReminderCount, setCustomReminderCount] = useState("7");
   const [customReminderUnit, setCustomReminderUnit] = useState("days");

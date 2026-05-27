@@ -2,6 +2,7 @@
  * Centered info dialog with title, body, and a single centered OK control — matches waste-report / in-app info style.
  */
 
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 import React from "react";
 import {
   Modal,
@@ -29,6 +30,8 @@ export function SimpleInfoModal({
   onDismiss,
   accentColor = "#15803D",
 }: SimpleInfoModalProps) {
+  useModalNavigationBar(visible);
+
   return (
     <Modal
       visible={visible}

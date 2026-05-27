@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 import { foodCategoryIcons } from "@/utils/foodCategoryIcons";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -49,6 +50,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
 }) => {
   const theme = useColorScheme();
   const isDark = theme === "dark";
+  useModalNavigationBar(visible);
 
   const [name, setName] = useState(itemData.name);
   const [quantity, setQuantity] = useState(itemData.quantity);

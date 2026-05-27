@@ -9,6 +9,7 @@ import {
   modalRowSecondaryContainer,
   modalRowSecondaryLabel,
 } from "@/theme/modalActionStyles";
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 import React from "react";
 import {
   Modal,
@@ -43,6 +44,7 @@ export function ConfirmModal({
   onConfirm,
 }: ConfirmModalProps) {
   const isDestructive = variant === "destructive";
+  useModalNavigationBar(visible);
 
   return (
     <Modal

@@ -10,6 +10,7 @@ import {
   modalRowSecondaryLabel,
 } from "@/theme/modalActionStyles";
 import { FoodItem } from "@/lib/supabase";
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 import React, { useEffect, useState } from "react";
 import {
   Modal,
@@ -39,6 +40,8 @@ export function ThrowAwayModal({
   onConfirm,
   onCancel,
 }: ThrowAwayModalProps) {
+  useModalNavigationBar(visible);
+
   const stockQty = item ? (typeof item.quantity === "number" ? item.quantity : 1) : 1;
   const maxQty = Math.min(stockQty, MAX_INVENTORY_QUANTITY);
   const isMultiQty = maxQty > 1;

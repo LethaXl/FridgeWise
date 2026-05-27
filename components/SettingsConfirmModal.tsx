@@ -4,6 +4,7 @@ import {
   modalRowSecondaryContainer,
   modalRowSecondaryLabel,
 } from "@/theme/modalActionStyles";
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect } from "react";
 import {
@@ -57,6 +58,7 @@ export function SettingsConfirmModal({
   accent = "none",
 }: SettingsConfirmModalProps) {
   const singleAction = !onSecondary;
+  useModalNavigationBar(visible);
 
   useEffect(() => {
     if (!visible || !autoDismissMs || busy) return;

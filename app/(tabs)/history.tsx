@@ -30,6 +30,7 @@ import SkeletonBlock from "@/components/SkeletonBlock";
 import { supabase, UsageLog } from "@/lib/supabase";
 import { formatQuantityWithUnit } from "@/utils/formatQuantityUnit";
 import { isOfflineLikeError } from "@/utils/networkError";
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 
 const fridgeIconAsset = require("@/assets/images/icons/fridge_icon.png");
 const shelfIconAsset = require("@/assets/images/icons/shelf_icon.png");
@@ -138,6 +139,7 @@ export default function HistoryScreen() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Row | null>(null);
   const [offlineNoticeVisible, setOfflineNoticeVisible] = useState(false);
+  useModalNavigationBar(deleteTarget != null);
   const [searchQuery, setSearchQuery] = useState("");
   const insets = useSafeAreaInsets();
 

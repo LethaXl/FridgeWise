@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   FlatList,
@@ -54,6 +55,7 @@ export function SimpleCalendar({
 
   // ── Month/year wheel picker (same UX as Calendar screen) ───────────────────
   const [pickerOpen, setPickerOpen] = useState(false);
+  useModalNavigationBar(pickerOpen);
   const [tempMonth, setTempMonth] = useState(month + 1);
   const [tempYear, setTempYear] = useState(year);
 

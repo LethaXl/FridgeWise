@@ -62,6 +62,7 @@ import {
   isOfflineLikeError,
 } from "@/utils/networkError";
 import { firstNameForGreeting } from "@/utils/personNameInput";
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 
 type LocationFilter = "all" | "fridge" | "shelf";
 
@@ -470,6 +471,7 @@ export default function HomeScreen() {
   const [throwAwayModalItem, setThrowAwayModalItem] = useState<FoodItem | null>(null);
   const [removeModalItem, setRemoveModalItem] = useState<FoodItem | null>(null);
   const [offlineNoticeVisible, setOfflineNoticeVisible] = useState(false);
+  useModalNavigationBar(pinModalVisible || removeModalItem !== null);
   /** Spinner on row: green = consume / use-all, red = throw away / delete */
   const [homeItemActionPending, setHomeItemActionPending] = useState<{
     id: string;

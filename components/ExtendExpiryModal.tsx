@@ -1,6 +1,7 @@
 // Extend Expiry Modal - Phase 2 Implementation
 // Quick action modal for extending item expiry dates with preset options
 
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { FoodItem } from "@/lib/supabase";
 import { calculateEnhancedUrgency } from "@/utils/urgencyUtils";
@@ -94,6 +95,7 @@ const ExtendExpiryModal: React.FC<ExtendExpiryModalProps> = ({
   accessibilityEnabled = true,
 }) => {
   const screenHeight = Dimensions.get("window").height;
+  useModalNavigationBar(visible);
 
   // Theme colors
   const backgroundColor = useThemeColor(

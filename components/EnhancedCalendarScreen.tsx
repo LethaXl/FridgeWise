@@ -28,6 +28,7 @@ import {
   modalStackedCancelContainer,
   modalStackedCancelLabel,
 } from "@/theme/modalActionStyles";
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 import { getFoodCategoryIcon } from "@/lib/foodCategories";
 import { Calendar } from "react-native-calendars";
 import {
@@ -191,6 +192,7 @@ function EnhancedCalendarScreenCore({
   const expiredDropdownAnim = useRef(new Animated.Value(0)).current;
   const [showExpiredBox, setShowExpiredBox] = useState(false);
   const [removeModalItem, setRemoveModalItem] = useState<FoodItem | null>(null);
+  useModalNavigationBar(monthPickerOpen || !!removeModalItem);
 
   // Re-apply when parent passes new navigation intent (nonce). Otherwise switching
   // to Timeline locally leaves viewMode as "timeline" while initialViewMode stays

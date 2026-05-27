@@ -4,6 +4,7 @@ import {
   setIntroOnboardingDone,
   setOnboardingFullyDone,
 } from "@/lib/onboardingStorage";
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -110,6 +111,7 @@ export default function FirstRunOnboarding({
 
   const showIntroModal = eligible && !introDone;
   const showCoachmark = eligible && introDone && !coachmarkDone;
+  useModalNavigationBar(showIntroModal || showCoachmark);
 
   const introAnim = useModalEntrance(showIntroModal);
   const coachAnim = useModalEntrance(showCoachmark);

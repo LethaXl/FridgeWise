@@ -7,6 +7,7 @@ import { getReportCategoryIcon } from "@/lib/reportCategoryIcons";
 import { useAuth } from "@/contexts/AuthContext";
 import { loadWasteReportAllTime } from "@/services/insightsReportData";
 import { isOfflineLikeError } from "@/utils/networkError";
+import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { router, useFocusEffect } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -55,6 +56,7 @@ export default function WasteReportScreen() {
   const [error, setError] = useState<string | null>(null);
   const [offlineNoticeVisible, setOfflineNoticeVisible] = useState(false);
   const [avgDaysInfoVisible, setAvgDaysInfoVisible] = useState(false);
+  useModalNavigationBar(avgDaysInfoVisible);
 
   const load = useCallback(async () => {
     if (!user?.id) return;
