@@ -40,8 +40,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 /** Cold-start auth can be slow after device sleep, but startup should not block indefinitely. */
-const AUTH_INIT_TIMEOUT_MS = 10_000;
-const AUTH_INIT_RETRY_DELAY_MS = 1_000;
+const AUTH_INIT_TIMEOUT_MS = 4_500;
 const REMEMBER_ME_READ_TIMEOUT_MS = 2_000;
 
 /** Stale or revoked refresh token in local storage — clear session instead of surfacing a red error loop. */
@@ -110,10 +109,6 @@ function isAuthInitTimeoutError(error: unknown): boolean {
   return error instanceof Error && error.message === "auth-init-timeout";
 }
 
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -172,63 +167,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
 
     const init = async () => {
-      while (!cancelled) {
-        try {
-          let session = await readSessionWithinTimeout(AUTH_INIT_TIMEOUT_MS);
+      try {
+        let session = await readSessionWithinTimeout(AUTH_INIT_TIMEOUT_MS);
 
-          const rememberRaw = await Promise.race([
-            AsyncStorage.getItem(REMEMBER_ME_STORAGE_KEY),
-            new Promise<string | null>((resolve) =>
-              setTimeout(() => resolve(null), REMEMBER_ME_READ_TIMEOUT_MS)
-            ),
-          ]);
+        const rememberRaw = await Promise.race([
+          AsyncStorage.getItem(REMEMBER_ME_STORAGE_KEY),
+          new Promise<string | null>((resolve) =>
+            setTimeout(() => resolve(null), REMEMBER_ME_READ_TIMEOUT_MS)
+          ),
+        ]);
 
-          if (session && rememberRaw === "false") {
-            await supabase.auth.signOut();
-            session = await readSessionOrClearStaleAuth();
-          }
-
-          if (cancelled) return;
-
-          setSession(session);
-          setUser(session?.user ?? null);
-          setLoading(false);
-
-          if (session?.user) {
-            void fetchUserProfileById(session.user.id).then((profile) => {
-              if (!cancelled) setUserProfile(profile);
-            });
-          }
-          return;
-        } catch (error) {
-          if (cancelled) return;
-          if (!isAuthInitTimeoutError(error)) {
-            if (__DEV__) {
-              console.warn("Auth init failed");
-            }
-            setSession(null);
-            setUser(null);
-            setLoading(false);
-            return;
-          }
-          if (__DEV__) {
-            console.warn("Auth init timed out; retrying");
-          }
-          await delay(AUTH_INIT_RETRY_DELAY_MS);
+        if (session && rememberRaw === "false") {
+          await supabase.auth.signOut();
+          session = await readSessionOrClearStaleAuth();
         }
+
+        if (cancelled) return;
+
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+
+        if (session?.user) {
+          void fetchUserProfileById(session.user.id).then((profile) => {
+            if (!cancelled) setUserProfile(profile);
+          });
+        }
+      } catch (error) {
+        if (cancelled) return;
+        if (__DEV__) {
+          console.warn(
+            isAuthInitTimeoutError(error) ? "Auth init timed out" : "Auth init failed"
+          );
+        }
+        setSession(null);
+        setUser(null);
+        setLoading(false);
       }
     };
 
     void init();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          const profile = await fetchUserProfileById(session.user.id);
-          setUserProfile(profile);
+          const userId = session.user.id;
+          setTimeout(() => {
+            void fetchUserProfileById(userId).then((profile) => {
+              if (!cancelled) setUserProfile(profile);
+            });
+          }, 0);
         } else {
           setUserProfile(null);
         }

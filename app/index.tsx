@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Image, StyleSheet, View } from "react-native";
 
 const SPLASH_BACKGROUND = "rgb(204, 245, 201)";
-const INITIAL_URL_TIMEOUT_MS = 5000;
+const INITIAL_URL_TIMEOUT_MS = 1500;
 const SPLASH_FAILSAFE_MS = 5_000;
 
 function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {

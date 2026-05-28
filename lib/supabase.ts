@@ -1,4 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, processLock } from "@supabase/supabase-js";
+import { AppState } from "react-native";
 import "react-native-url-polyfill/auto";
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || "";
@@ -118,6 +119,16 @@ function isReactNativeIosOrAndroid(): boolean {
   }
 }
 
+function isReactNativeWeb(): boolean {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { Platform } = require("react-native");
+    return Platform.OS === "web";
+  } catch {
+    return false;
+  }
+}
+
 function getAsyncStorageOrFallback(): StorageLike {
   // Node / Jest: no react-native bridge — avoid AsyncStorage (needs `window` in some builds).
   if (!isReactNativeIosOrAndroid() && typeof window === "undefined") {
@@ -149,9 +160,24 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    lock: processLock,
   },
   global: { fetch: fetchWithRetry },
 });
+
+if (!isReactNativeWeb()) {
+  if (AppState.currentState === "active") {
+    supabase.auth.startAutoRefresh();
+  }
+
+  AppState.addEventListener("change", (state) => {
+    if (state === "active") {
+      supabase.auth.startAutoRefresh();
+    } else {
+      supabase.auth.stopAutoRefresh();
+    }
+  });
+}
 
 // Ephemeral auth client for credential checks that must NOT mutate the app session.
 // (Using the main client for signInWithPassword can trigger auth state changes and logout.)
