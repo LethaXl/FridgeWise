@@ -14,6 +14,7 @@ import {
   Animated,
   Dimensions,
   Easing,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -55,12 +56,30 @@ export default function WelcomeScreen() {
   const [resetEmailModalVisible, setResetEmailModalVisible] = useState(false);
   const [offlineNoticeVisible, setOfflineNoticeVisible] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
 
   useEffect(() => {
     if (!authLoading && user) {
       router.replace("/(tabs)");
     }
   }, [authLoading, router, user]);
+
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+
+    const showSub = Keyboard.addListener("keyboardDidShow", (event) => {
+      const keyboardHeight = event.endCoordinates?.height ?? 0;
+      setKeyboardOffset(Math.min(keyboardHeight * 0.5, 180));
+    });
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardOffset(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   // 60-second cooldown timer after requesting password reset
   useEffect(() => {
@@ -285,7 +304,7 @@ export default function WelcomeScreen() {
   const { width: screenWidth } = Dimensions.get("window");
   const modalWidth = 300;
   const slideDown: any = {
-    top: screenHeight * 0.26 - 12,
+    top: screenHeight * 0.26 - 12 - keyboardOffset,
     left: screenWidth * 0.5,
     width: modalWidth,
     transform: [
@@ -581,7 +600,7 @@ export default function WelcomeScreen() {
             collapsable={false}
           >
             <KeyboardAvoidingView
-              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              behavior={Platform.OS === "ios" ? "padding" : undefined}
               style={styles.loginModalInner}
             >
               <TouchableOpacity

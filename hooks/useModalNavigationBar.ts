@@ -1,4 +1,5 @@
 import * as NavigationBar from "expo-navigation-bar";
+import * as SystemUI from "expo-system-ui";
 import {
   setStatusBarBackgroundColor,
   setStatusBarStyle,
@@ -27,6 +28,9 @@ function applySystemBarStyle() {
     dimmed ? MODAL_SYSTEM_BAR_BG : DEFAULT_SYSTEM_BAR_BG
   ).catch(() => {});
   void NavigationBar.setButtonStyleAsync("dark").catch(() => {});
+  void SystemUI.setBackgroundColorAsync(
+    dimmed ? MODAL_SYSTEM_BAR_BG : DEFAULT_SYSTEM_BAR_BG
+  ).catch(() => {});
 }
 
 function scheduleSystemBarStyleRefresh() {

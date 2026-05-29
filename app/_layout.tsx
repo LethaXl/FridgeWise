@@ -1,5 +1,6 @@
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import * as NavigationBar from "expo-navigation-bar";
+import * as SystemUI from "expo-system-ui";
 import { useFonts } from "expo-font";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -41,6 +42,7 @@ void SplashScreen.preventAutoHideAsync().catch(() => {});
 
 /** Matches `components/SplashScreen` so we never flash black while fonts load. */
 const FONT_LOADING_BG = "rgb(204, 245, 201)";
+const APP_BG = "#FFFFFF";
 const ANDROID_NAV_BAR_BG = "#FFFFFF";
 
 // Custom light theme configuration to override system settings
@@ -79,6 +81,7 @@ export default function RootLayout() {
     const applyNavigationBarStyle = () => {
       void NavigationBar.setBackgroundColorAsync(ANDROID_NAV_BAR_BG).catch(() => {});
       void NavigationBar.setButtonStyleAsync("dark").catch(() => {});
+      void SystemUI.setBackgroundColorAsync(ANDROID_NAV_BAR_BG).catch(() => {});
     };
 
     applyNavigationBarStyle();
@@ -179,7 +182,7 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: FONT_LOADING_BG }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: APP_BG }}>
       <SafeAreaProvider>
         <AuthProvider>
           <SettingsProvider>
@@ -191,7 +194,7 @@ export default function RootLayout() {
                       headerShown: false,
                       contentStyle: {
                         flex: 1,
-                        backgroundColor: FONT_LOADING_BG,
+                        backgroundColor: APP_BG,
                       },
                       animation: "fade",
                     }}
