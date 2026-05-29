@@ -36,7 +36,7 @@ import {
   GestureDetector,
   PanGestureHandlerEventPayload,
 } from "react-native-gesture-handler";
-import { runOnJS, useSharedValue } from "react-native-reanimated";
+import { runOnJS } from "react-native-reanimated";
 import {
   useCalendarPerformance,
   useEnhancedCalendar,
@@ -265,7 +265,6 @@ function EnhancedCalendarScreenCore({
   const { width: screenWidth } = useWindowDimensions();
 
   const slideTranslate = useRef(new Animated.Value(0)).current;
-  const slideTarget = useSharedValue(0);
 
   const switchViewMode = useCallback((next: ViewMode) => {
     if (next === viewMode) return;
@@ -274,51 +273,13 @@ function EnhancedCalendarScreenCore({
 
   useEffect(() => {
     const target = viewMode === "calendar" ? 0 : -screenWidth;
-    slideTarget.value = target;
     Animated.spring(slideTranslate, {
       toValue: target,
       useNativeDriver: true,
       damping: 20,
       stiffness: 200,
     }).start();
-  }, [viewMode, screenWidth, slideTranslate, slideTarget]);
-
-  const runSpringTo = useCallback(
-    (target: number) => {
-      Animated.spring(slideTranslate, {
-        toValue: target,
-        useNativeDriver: true,
-        damping: 22,
-        stiffness: 220,
-      }).start();
-    },
-    [slideTranslate]
-  );
-
-  const viewModeSwipeGesture = useMemo(() => {
-    const SWIPE_THRESHOLD = screenWidth * 0.25;
-    const VELOCITY_THRESHOLD = 300;
-    return Gesture.Pan()
-      .activeOffsetX([-25, 25])
-      .failOffsetY([-30, 30])
-      .onUpdate((e: PanGestureHandlerEventPayload) => {
-        const rest = slideTarget.value;
-        const next = Math.min(0, Math.max(-screenWidth, rest + e.translationX));
-        slideTranslate.setValue(next);
-      })
-      .onEnd((e: PanGestureHandlerEventPayload) => {
-        const rest = slideTarget.value;
-        const finalX = rest + e.translationX;
-        const goTimeline = e.velocityX < -VELOCITY_THRESHOLD || (rest === 0 && finalX < -SWIPE_THRESHOLD);
-        const goCalendar = e.velocityX > VELOCITY_THRESHOLD || (rest === -screenWidth && finalX > -screenWidth + SWIPE_THRESHOLD);
-        const newTarget = goTimeline ? -screenWidth : goCalendar ? 0 : rest;
-        if (newTarget !== rest) {
-          runOnJS(setViewMode)(newTarget === 0 ? "calendar" : "timeline");
-        }
-        slideTarget.value = newTarget;
-        runOnJS(runSpringTo)(newTarget);
-      });
-  }, [screenWidth, slideTranslate, slideTarget, runSpringTo]);
+  }, [viewMode, screenWidth, slideTranslate]);
 
   // ── icon renderer ──
   // ── handlers ──
@@ -975,8 +936,7 @@ function EnhancedCalendarScreenCore({
           </View>
         </View>
 
-        <GestureDetector gesture={viewModeSwipeGesture}>
-          <View style={{ flex: 1, overflow: "hidden" }}>
+        <View style={{ flex: 1, overflow: "hidden" }}>
             <Animated.View
               style={{
                 flexDirection: "row",
@@ -1575,8 +1535,7 @@ function EnhancedCalendarScreenCore({
             </ScrollView>
               </View>
             </Animated.View>
-          </View>
-        </GestureDetector>
+        </View>
 
         {/* Remove item modal: Throw Away vs Delete */}
         <Modal
