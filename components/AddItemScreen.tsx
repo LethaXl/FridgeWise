@@ -2201,6 +2201,8 @@ export default function AddItemScreen() {
           transparent
           animationType="fade"
           visible={showNotificationTimePicker}
+          statusBarTranslucent
+          navigationBarTranslucent
           onRequestClose={() => setShowNotificationTimePicker(false)}
         >
           <View

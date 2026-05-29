@@ -2191,6 +2191,8 @@ export default function HomeScreen() {
       <Modal
         visible={removeModalItem !== null}
         transparent
+        statusBarTranslucent
+        navigationBarTranslucent
         animationType="none"
         onRequestClose={() => setRemoveModalItem(null)}
       >
@@ -2247,6 +2249,8 @@ export default function HomeScreen() {
         visible={pinModalVisible}
         animationType="fade"
         transparent
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => {
           setPinModalVisible(false);
           setPinSearchQuery("");

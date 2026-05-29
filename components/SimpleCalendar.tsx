@@ -292,6 +292,8 @@ export function SimpleCalendar({
       <Modal
         transparent
         visible={pickerOpen}
+        statusBarTranslucent
+        navigationBarTranslucent
         animationType="fade"
         onRequestClose={() => setPickerOpen(false)}
       >

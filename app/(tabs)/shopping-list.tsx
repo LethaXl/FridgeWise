@@ -701,6 +701,8 @@ export default function ShoppingListScreen() {
         <Modal
           visible={addOpen}
           transparent
+          statusBarTranslucent
+          navigationBarTranslucent
           animationType="fade"
           onRequestClose={() => setAddOpen(false)}
         >

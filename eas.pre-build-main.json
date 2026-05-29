@@ -14,10 +14,7 @@
       }
     },
     "preview": {
-      "distribution": "internal",
-      "android": {
-        "credentialsSource": "local"
-      }
+      "distribution": "internal"
     },
     "production": {}
   },

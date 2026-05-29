@@ -340,6 +340,8 @@ export default function WasteReportScreen() {
       <Modal
         visible={avgDaysInfoVisible}
         transparent
+        statusBarTranslucent
+        navigationBarTranslucent
         animationType="fade"
         onRequestClose={() => setAvgDaysInfoVisible(false)}
       >

@@ -715,6 +715,8 @@ export default function HistoryScreen() {
       <Modal
         transparent
         visible={deleteTarget != null}
+        statusBarTranslucent
+        navigationBarTranslucent
         animationType="fade"
         onRequestClose={() => setDeleteTarget(null)}
       >
