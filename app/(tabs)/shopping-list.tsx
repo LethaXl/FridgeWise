@@ -702,7 +702,7 @@ export default function ShoppingListScreen() {
           visible={addOpen}
           transparent
           statusBarTranslucent
-          navigationBarTranslucent={false}
+          navigationBarTranslucent
           animationType="fade"
           onRequestClose={() => setAddOpen(false)}
         >

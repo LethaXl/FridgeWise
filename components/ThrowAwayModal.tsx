@@ -89,7 +89,7 @@ export function ThrowAwayModal({
       visible={visible}
       transparent
       statusBarTranslucent
-      navigationBarTranslucent={false}
+      navigationBarTranslucent
       animationType="none"
       onRequestClose={onCancel}
     >

@@ -341,7 +341,7 @@ export default function WasteReportScreen() {
         visible={avgDaysInfoVisible}
         transparent
         statusBarTranslucent
-        navigationBarTranslucent={false}
+        navigationBarTranslucent
         animationType="fade"
         onRequestClose={() => setAvgDaysInfoVisible(false)}
       >

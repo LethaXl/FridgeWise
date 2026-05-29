@@ -144,7 +144,7 @@ export default function FirstRunOnboarding({
         animationType="none"
         transparent
         statusBarTranslucent
-        navigationBarTranslucent={false}
+        navigationBarTranslucent
         onRequestClose={onIntroContinue}
       >
         <View style={styles.scrimRoot} accessibilityViewIsModal>
@@ -184,7 +184,7 @@ export default function FirstRunOnboarding({
         animationType="none"
         transparent
         statusBarTranslucent
-        navigationBarTranslucent={false}
+        navigationBarTranslucent
         onRequestClose={onCoachmarkDismiss}
       >
         <View style={styles.coachRoot} pointerEvents="box-none">

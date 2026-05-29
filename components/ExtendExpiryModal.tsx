@@ -276,7 +276,7 @@ const ExtendExpiryModal: React.FC<ExtendExpiryModalProps> = ({
       visible={visible}
       transparent={true}
       statusBarTranslucent
-      navigationBarTranslucent={false}
+      navigationBarTranslucent
       animationType="none"
       onRequestClose={onClose}
       accessible={accessibilityEnabled}

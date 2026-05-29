@@ -38,7 +38,7 @@ export function SimpleInfoModal({
       transparent
       animationType="fade"
       statusBarTranslucent
-      navigationBarTranslucent={false}
+      navigationBarTranslucent
       onRequestClose={onDismiss}
     >
       <Pressable
