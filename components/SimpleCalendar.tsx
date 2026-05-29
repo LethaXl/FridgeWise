@@ -293,7 +293,7 @@ export function SimpleCalendar({
         transparent
         visible={pickerOpen}
         statusBarTranslucent
-        navigationBarTranslucent
+        navigationBarTranslucent={false}
         animationType="fade"
         onRequestClose={() => setPickerOpen(false)}
       >

@@ -1542,7 +1542,7 @@ function EnhancedCalendarScreenCore({
           transparent
           visible={!!removeModalItem}
           statusBarTranslucent
-          navigationBarTranslucent
+          navigationBarTranslucent={false}
           animationType="fade"
           onRequestClose={() => setRemoveModalItem(null)}
         >
@@ -1595,7 +1595,7 @@ function EnhancedCalendarScreenCore({
           transparent
           visible={monthPickerOpen}
           statusBarTranslucent
-          navigationBarTranslucent
+          navigationBarTranslucent={false}
           animationType="fade"
           onRequestClose={() => setMonthPickerOpen(false)}
         >

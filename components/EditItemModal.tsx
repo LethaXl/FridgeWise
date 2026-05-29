@@ -125,7 +125,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
       visible={visible}
       transparent
       statusBarTranslucent
-      navigationBarTranslucent
+      navigationBarTranslucent={false}
       animationType="fade"
       onRequestClose={onClose}
     >

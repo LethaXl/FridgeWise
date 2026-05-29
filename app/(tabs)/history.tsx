@@ -716,7 +716,7 @@ export default function HistoryScreen() {
         transparent
         visible={deleteTarget != null}
         statusBarTranslucent
-        navigationBarTranslucent
+        navigationBarTranslucent={false}
         animationType="fade"
         onRequestClose={() => setDeleteTarget(null)}
       >

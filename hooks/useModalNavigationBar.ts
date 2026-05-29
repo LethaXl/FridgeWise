@@ -29,12 +29,24 @@ function applySystemBarStyle() {
   void NavigationBar.setButtonStyleAsync("dark").catch(() => {});
 }
 
+function scheduleSystemBarStyleRefresh() {
+  applySystemBarStyle();
+
+  const timers = [80, 250, 500].map((delay) =>
+    setTimeout(applySystemBarStyle, delay)
+  );
+
+  return () => {
+    timers.forEach(clearTimeout);
+  };
+}
+
 export function useModalNavigationBar(visible: boolean) {
   useEffect(() => {
     if (Platform.OS !== "android" || !visible) return;
 
     visibleModalCount += 1;
-    applySystemBarStyle();
+    const clearScheduledRefresh = scheduleSystemBarStyleRefresh();
 
     const sub = AppState.addEventListener("change", (state) => {
       if (state === "active") {
@@ -43,9 +55,10 @@ export function useModalNavigationBar(visible: boolean) {
     });
 
     return () => {
+      clearScheduledRefresh();
       sub.remove();
       visibleModalCount = Math.max(0, visibleModalCount - 1);
-      applySystemBarStyle();
+      scheduleSystemBarStyleRefresh();
     };
   }, [visible]);
 }

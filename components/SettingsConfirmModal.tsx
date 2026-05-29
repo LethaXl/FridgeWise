@@ -73,7 +73,7 @@ export function SettingsConfirmModal({
       visible={visible}
       transparent
       statusBarTranslucent
-      navigationBarTranslucent
+      navigationBarTranslucent={false}
       animationType="fade"
       onRequestClose={busy ? undefined : onRequestClose}
     >
