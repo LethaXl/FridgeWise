@@ -1,5 +1,5 @@
 // Enhanced Calendar Data Models and Interfaces
-// Extends existing calendar types with improvements for UI/UX issues
+// Extends existing calendar types with improvements
 
 import { FoodItem } from "../lib/supabase";
 import { CalendarMonth, MarkedDatesType } from "./calendar";

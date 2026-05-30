@@ -5,14 +5,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-/**
- * Enhanced Tab Layout - 4 Core Tabs + FAB
- * Professional navigation structure following UI/UX best practices
- */
+
 export default function TabLayout() {
   useExpiryNotificationNavigation();
 
-  // Wrapper for tab labels to ensure proper text rendering
+  // Wrapper keeps custom tab labels rendered through SafeText.
   const TabLabel = ({ label }: { label: string }) => (
     <SafeText>{label}</SafeText>
   );
@@ -20,9 +17,8 @@ export default function TabLayout() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }} edges={["right", "left"]}>
       <Tabs
-        // Custom tab bar uses its own bottom offset; forcing bottom inset to 0
-        // avoids stale initialWindowMetrics on cold start (splash → tabs) stacking
-        // with that offset and lifting the bar vs welcome → (tabs) after manual sign-in.
+        // Custom tab bar handles bottom spacing; forcing this to 0 avoids
+        // stale initialWindowMetrics lifting the bar after cold starts.
         safeAreaInsets={{ bottom: 0 }}
         screenOptions={{
           headerShown: false,
@@ -42,7 +38,7 @@ export default function TabLayout() {
       >
         {/* PRIMARY NAVIGATION - Core 4 Tabs */}
 
-        {/* 1. Home Tab - Main inventory overview */}
+        {/* 1. Home Tab*/}
         <Tabs.Screen
           name="index"
           options={{
@@ -55,7 +51,7 @@ export default function TabLayout() {
           }}
         />
 
-        {/* 2. Calendar Tab - Time-based expiry tracking */}
+        {/* 2. Calendar Tab */}
         <Tabs.Screen
           name="calendar"
           options={{
@@ -68,7 +64,7 @@ export default function TabLayout() {
           }}
         />
 
-        {/* 3. Groceries Tab - Planning and replenishing */}
+        {/* 3. Groceries Tab */}
         <Tabs.Screen
           name="shopping-list"
           options={{
@@ -81,7 +77,7 @@ export default function TabLayout() {
           }}
         />
 
-        {/* 4. More Tab - Secondary features */}
+        {/* 4. More Tab */}
         <Tabs.Screen
           name="more"
           options={{
@@ -94,14 +90,14 @@ export default function TabLayout() {
           }}
         />
 
-        {/* SECONDARY NAVIGATION - Hidden from main tab bar but accessible via FAB/More */}
+        {/* SECONDARY NAVIGATION */}
 
-        {/* Add Item - Accessible via FAB Speed Dial */}
+        {/* Add Item  */}
         <Tabs.Screen
           name="add"
           options={{
             title: "Add Item",
-            href: null, // Hide from tab bar - accessible via FAB
+            href: null,
             tabBarIcon: ({ color }) => (
               <Ionicons name="add-outline" color={color} size={24} />
             ),

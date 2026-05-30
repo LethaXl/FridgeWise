@@ -1,7 +1,6 @@
 /**
  * Enhanced Calendar State Reducer
  * Implements predictable state management for the Enhanced Expiry Calendar
- * Based on Phase 1 architecture validation
  */
 
 import { FoodItem } from "../lib/supabase";

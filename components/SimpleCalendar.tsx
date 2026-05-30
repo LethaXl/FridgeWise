@@ -26,11 +26,6 @@ function getFirstDayOfWeek(year: number, month: number) {
 interface SimpleCalendarProps {
   selectedDate: Date | null;
   onSelect: (date: Date) => void;
-  /**
-   * Optional callback to inform parent how many week rows
-   * are currently rendered (5 or 6). Used to adjust layout
-   * around the calendar.
-   */
   onWeeksChange?: (weeks: number) => void;
 }
 
@@ -61,7 +56,8 @@ export function SimpleCalendar({
 
   const WHEEL_ITEM_H = 32;
   const WHEEL_VISIBLE = 5;
-  const WHEEL_PAD = Math.floor(WHEEL_VISIBLE / 2); // 2
+  // Wheel padding keeps the selected row visually centered.
+  const WHEEL_PAD = Math.floor(WHEEL_VISIBLE / 2);
   const wheelSpacerH = WHEEL_PAD * WHEEL_ITEM_H;
 
   const MONTHS = useMemo(

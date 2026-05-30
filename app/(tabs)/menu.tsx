@@ -23,7 +23,6 @@ export default function MenuScreen() {
   const [signOutModalVisible, setSignOutModalVisible] = useState(false);
   const [signOutBusy, setSignOutBusy] = useState(false);
   const [offlineNoticeVisible, setOfflineNoticeVisible] = useState(false);
-  // Fixed light theme colors - no system detection
   const isDark = false;
   const cardBackgroundColor = "#FFFFFF";
   const cardBorderColor = "#F3F4F6";
@@ -54,19 +53,15 @@ export default function MenuScreen() {
     }
   };
 
-  // Navigate to enhanced reports
+
   const generateWasteReport = async () => {
     router.push("/(tabs)/waste-report");
   };
 
-  // Removed Consumption Report per requirements
 
-  // Generate shopping list
   const generateShoppingList = async () => {
     setLoading(true);
     try {
-      // In a real implementation, this would generate a shopping list based on low stock items
-      // For now, we'll show a placeholder
       Alert.alert(
         "Shopping List Generated",
         "Your shopping list has been created based on low stock items:\n\n1. Milk\n2. Eggs\n3. Bread\n4. Apples\n5. Chicken",

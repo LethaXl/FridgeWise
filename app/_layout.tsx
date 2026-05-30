@@ -72,7 +72,7 @@ export default function RootLayout() {
   });
 
   // Native splash is hidden from components/SplashScreen once the logo has painted.
-
+  // Supabase auth-js logs this harmless PKCE warning on React Native.
   useEffect(() => {
     if (Platform.OS !== "android") return;
 

@@ -1,6 +1,5 @@
 /**
  * Enhanced Tab Bar with Floating Action Button
- * Professional 4-tab navigation with integrated FAB and Speed Dial
  */
 
 import { BottomTabBarHeightCallbackContext } from "@react-navigation/bottom-tabs";

@@ -1,11 +1,6 @@
 import type { TextStyle } from "react-native";
 
-/**
- * Reference tokens for main screen titles (tab / stack headers).
- * Many screens still use local styles — align new work and refactors to these.
- *
- * Visual QA: compare Settings, More, Menu, Profile, Reports, Groceries, Home hero.
- */
+
 export const screenTitleLarge: TextStyle = {
   fontSize: 24,
   fontWeight: "700",

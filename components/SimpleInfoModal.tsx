@@ -1,7 +1,3 @@
-/**
- * Centered info dialog with title, body, and a single centered OK control — matches waste-report / in-app info style.
- */
-
 import { useModalNavigationBar } from "@/hooks/useModalNavigationBar";
 import React from "react";
 import {

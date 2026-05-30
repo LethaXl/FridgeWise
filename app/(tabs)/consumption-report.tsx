@@ -1,7 +1,3 @@
-/**
- * Consumption Report — all-time insights, green accent on white.
- */
-
 import { OfflineNoticeModal } from "@/components/OfflineNoticeModal";
 import { getReportCategoryIcon } from "@/lib/reportCategoryIcons";
 import { useAuth } from "@/contexts/AuthContext";

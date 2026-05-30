@@ -10,10 +10,7 @@ type RealisticFoodImageProps = {
   imageStyle?: ImageStyle;
 };
 
-/**
- * A component that displays a realistic food image based on the food name
- * Using high-quality food icons for better visual representation
- */
+
 export default function RealisticFoodImage({
   foodName,
   size = 60,

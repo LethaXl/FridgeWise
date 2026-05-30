@@ -1,6 +1,5 @@
 /**
- * FridgeWise — Calendar Screen (Redesigned UI)
- * All logic/hooks unchanged. Full visual overhaul.
+ * FridgeWise — Calendar Screen
  */
 
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";

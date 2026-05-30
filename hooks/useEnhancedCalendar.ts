@@ -1,7 +1,6 @@
 /**
  * Enhanced Calendar Hooks
  * Provides specialized hooks for enhanced calendar functionality
- * Based on Phase 1 validated architecture
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

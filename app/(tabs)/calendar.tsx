@@ -22,7 +22,6 @@ export default function CalendarScreen() {
   const { refresh, markItemUsed, state } = useCalendar();
   const hasRefreshedOnceRef = useRef(false);
   const lastRefreshAtRef = useRef(0);
-  /** After first completed fetch, keep calendar mounted so empty + refresh does not unmount/remount loop */
   const calendarHydratedRef = useRef(false);
   const prevUserIdRef = useRef<string | undefined>(user?.id);
 

@@ -181,15 +181,14 @@ export default function ResetPasswordScreen() {
       codePresent ||
       type === "recovery";
 
-    // Ignore unrelated URLs (ex: expo-development-client startup URL), so they
-    // don't incorrectly trigger expired state.
+    // Ignore unrelated startup URLs so they do not incorrectly trigger expired state.
     if (!isResetPath && !hasResetParams) {
       return false;
     }
 
     const err = params.error || params.error_code;
 
-    // Ignore non-recovery auth links (e.g. stale signup confirmation links).
+    // Ignore non-recovery auth links, such as stale signup confirmation links.
     if (type && type !== "recovery") {
       clearPendingResetPasswordUrl();
       return false;
@@ -227,7 +226,7 @@ export default function ResetPasswordScreen() {
       }
     }, 30000);
 
-    // Only show "expired" when we *actually* can't process the link.
+    // Only show "expired" when the link actually cannot be processed.
     if (err) {
       setState("expired");
       return;
@@ -282,8 +281,7 @@ export default function ResetPasswordScreen() {
           throw verifyError;
         }
       } else {
-        // Not a usable recovery link (common when Android drops URL fragments).
-        // Give the runtime link event a brief chance to arrive before showing expired.
+        // Android can deliver a bare deep link before the full token URL arrives.
         missingParamsTimeoutRef.current = setTimeout(() => {
           setState("expired");
         }, 2000);
@@ -315,8 +313,7 @@ export default function ResetPasswordScreen() {
     const pending = peekPendingResetPasswordUrl();
     const routeUrl = routeParamsToResetUrl(routeParams);
 
-    // Always attach a listener. On Android, an initial bare deep link can be
-    // delivered first, and the full URL with tokens can arrive shortly after.
+    // Always listen for the full token URL after an initial bare deep link.
     if (pending) {
       void handleUrl(pending);
     } else if (routeUrl) {

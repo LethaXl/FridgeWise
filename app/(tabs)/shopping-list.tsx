@@ -1,6 +1,5 @@
 /**
- * Groceries Screen (premium redesign)
- * Sleek, minimal, product-ready UI aligned with FridgeWise.
+ * Groceries Screen
  */
 
 import ScreenLayout from "@/components/ScreenLayout";

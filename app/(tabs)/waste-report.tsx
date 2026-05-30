@@ -1,5 +1,5 @@
 /**
- * Waste Report — all-time insights, red accent on white (parity with consumption report).
+ * Waste Report — all-time insights, red accent on white.
  */
 
 import { OfflineNoticeModal } from "@/components/OfflineNoticeModal";

@@ -1,7 +1,6 @@
 // app/(auth)/_layout.tsx
-// Use the root SafeAreaProvider only (see app/_layout.tsx). Nesting another
-// provider here caused inconsistent bottom insets: cold start → (tabs) looked
-// different from welcome → (tabs) (tab bar “floating” too high on Android).
+// Use the root SafeAreaProvider only. Nesting another provider caused
+// inconsistent Android bottom insets between cold start and auth navigation.
 import { Stack } from "expo-router";
 import React from "react";
 

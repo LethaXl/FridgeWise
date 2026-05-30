@@ -1,7 +1,6 @@
 /**
  * Enhanced Calendar Context Provider
  * Provides centralized state management for the enhanced expiry calendar
- * Based on Phase 1 validated architecture
  */
 
 import React, {

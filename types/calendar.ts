@@ -1,5 +1,5 @@
 // Enhanced Expiry Calendar Types
-// Based on design specifications from Phase 2
+
 
 import { FoodItem } from "../lib/supabase";
 
