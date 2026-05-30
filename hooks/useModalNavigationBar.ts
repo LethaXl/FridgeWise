@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { AppState, Platform } from "react-native";
 
 const MODAL_SYSTEM_BAR_BG = "#9CA3AF";
+const MODAL_STATUS_BAR_BG = "#E8EBF0";
 const DEFAULT_SYSTEM_BAR_BG = "#FFFFFF";
 
 let visibleModalCount = 0;
@@ -18,7 +19,7 @@ function applySystemBarStyle() {
 
   setStatusBarTranslucent(false);
   setStatusBarBackgroundColor(
-    dimmed ? MODAL_SYSTEM_BAR_BG : DEFAULT_SYSTEM_BAR_BG,
+    dimmed ? MODAL_STATUS_BAR_BG : DEFAULT_SYSTEM_BAR_BG,
     true
   );
   setStatusBarStyle("dark", true);
