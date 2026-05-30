@@ -89,7 +89,7 @@ export function ConsumeModal({
       visible={visible}
       transparent
       statusBarTranslucent
-      navigationBarTranslucent
+      navigationBarTranslucent={false}
       animationType="none"
       onRequestClose={onCancel}
     >

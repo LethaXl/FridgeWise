@@ -253,7 +253,7 @@ export default function AddItemScreen() {
   );
   const [showNotificationTimePicker, setShowNotificationTimePicker] =
     useState(false);
-  useModalNavigationBar(showNotificationTimePicker);
+  useModalNavigationBar(showNotificationTimePicker && Platform.OS !== "android");
   const [reminderMenuOpen, setReminderMenuOpen] = useState(false);
   const [customReminderCount, setCustomReminderCount] = useState("7");
   const [customReminderUnit, setCustomReminderUnit] = useState("days");
@@ -1048,8 +1048,8 @@ export default function AddItemScreen() {
       {!showSuccess && (
         <KeyboardAvoidingView
           style={{ flex: 1, zIndex: 0 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 24}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={0}
         >
           <Animated.View style={{ flex: 1, opacity: fadeAnim, zIndex: 0 }}>
             <ScrollView
@@ -2202,7 +2202,7 @@ export default function AddItemScreen() {
           animationType="fade"
           visible={showNotificationTimePicker}
           statusBarTranslucent
-          navigationBarTranslucent
+          navigationBarTranslucent={false}
           onRequestClose={() => setShowNotificationTimePicker(false)}
         >
           <View
