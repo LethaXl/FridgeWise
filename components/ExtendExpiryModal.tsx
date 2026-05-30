@@ -560,7 +560,7 @@ const ExtendExpiryModal: React.FC<ExtendExpiryModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(15, 23, 42, 0.4)",
     justifyContent: "flex-end",
   },
   backdrop: {
@@ -577,8 +577,8 @@ const styles = StyleSheet.create({
     elevation: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
+    shadowOpacity: 0.15,
+    shadowRadius: 18,
   },
   header: {
     borderBottomWidth: 1,

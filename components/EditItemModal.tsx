@@ -364,16 +364,24 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(15, 23, 42, 0.4)",
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 24,
   },
   modalContainer: {
-    width: "90%",
+    width: "100%",
     maxWidth: 400,
     backgroundColor: "white",
-    borderRadius: 12,
+    borderRadius: 20,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 6,
   },
   header: {
     flexDirection: "row",

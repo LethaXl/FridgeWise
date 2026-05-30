@@ -3528,7 +3528,7 @@ const styles = StyleSheet.create({
   },
   removeModalBackdrop: {
     flex: 1,
-    backgroundColor: "rgba(15,23,42,0.25)",
+    backgroundColor: "rgba(15, 23, 42, 0.4)",
     justifyContent: "center",
     paddingHorizontal: 24,
   },

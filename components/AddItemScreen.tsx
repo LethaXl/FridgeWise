@@ -2208,16 +2208,26 @@ export default function AddItemScreen() {
           <View
             style={{
               flex: 1,
-              backgroundColor: "rgba(15,23,42,0.35)",
+              backgroundColor: "rgba(15, 23, 42, 0.4)",
               justifyContent: "center",
+              alignItems: "center",
               paddingHorizontal: 24,
             }}
           >
             <View
               style={{
+                width: "100%",
+                maxWidth: 340,
                 backgroundColor: "#FFF",
-                borderRadius: 18,
+                borderRadius: 20,
                 padding: 16,
+                borderWidth: 1,
+                borderColor: "#E5E7EB",
+                shadowColor: "#000",
+                shadowOpacity: 0.15,
+                shadowRadius: 18,
+                shadowOffset: { width: 0, height: 10 },
+                elevation: 6,
               }}
             >
               <DateTimePicker

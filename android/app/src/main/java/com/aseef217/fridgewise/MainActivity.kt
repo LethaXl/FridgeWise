@@ -1,7 +1,6 @@
 package com.aseef217.fridgewise
 import expo.modules.splashscreen.SplashScreenManager
 
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 
@@ -22,7 +21,6 @@ class MainActivity : ReactActivity() {
     SplashScreenManager.registerOnActivity(this)
     // @generated end expo-splashscreen
     super.onCreate(null)
-    window.navigationBarColor = Color.WHITE
   }
 
   /**

@@ -2315,8 +2315,9 @@ const S = StyleSheet.create({
 
   monthModalBackdrop: {
     flex: 1,
-    backgroundColor: "rgba(15,23,42,0.35)",
+    backgroundColor: "rgba(15, 23, 42, 0.4)",
     justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 24,
   },
   monthModalCard: {
@@ -2325,11 +2326,14 @@ const S = StyleSheet.create({
     padding: 16,
     maxHeight: "60%",
     width: "100%",
+    maxWidth: 340,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
     shadowColor: "#000",
-    shadowOpacity: 0.14,
+    shadowOpacity: 0.15,
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 10 },
-    elevation: 10,
+    elevation: 6,
   },
   monthModalViewLabel: {
     textAlign: "center",
@@ -2569,7 +2573,7 @@ const S = StyleSheet.create({
   },
   removeModalBackdrop: {
     flex: 1,
-    backgroundColor: "rgba(15,23,42,0.25)",
+    backgroundColor: "rgba(15, 23, 42, 0.4)",
     justifyContent: "center",
     paddingHorizontal: 24,
   },
