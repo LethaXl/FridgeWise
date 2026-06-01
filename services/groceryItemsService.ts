@@ -91,6 +91,7 @@ export const groceryItemsService = {
     const { data, error } = await supabase
       .from("grocery_items")
       .select("*")
+      .eq("user_id", user.id)
       .order("added_date", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false });
 

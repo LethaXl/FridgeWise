@@ -36,7 +36,7 @@ import {
   Image,
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { formatQuantityWithUnit } from "@/utils/formatQuantityUnit";
@@ -173,57 +173,59 @@ export default function ShoppingListScreen() {
   // DATA LOADING
   // =============================================================================
 
-  const handleRefresh = useCallback(async () => {
-    setRefreshing(true);
-    // No auto-generated items; keep the user's list.
-    setRefreshing(false);
-  }, []);
-
-  // Load saved list (cloud when signed in, else local). Avoid persisting [] before hydrate.
-  useEffect(() => {
-    let cancelled = false;
+  const loadShoppingListData = useCallback(
+    async (isCancelled: () => boolean = () => false) => {
     listHydratedRef.current = false;
 
-    (async () => {
-      try {
-        const raw = await AsyncStorage.getItem(SHOPPING_LIST_STORAGE_KEY);
-        const localStored = parseStoredGroceryList(raw);
-        let restored: GroceryItem[] = localStored.map(storedToGroceryItem);
+    try {
+      const raw = await AsyncStorage.getItem(SHOPPING_LIST_STORAGE_KEY);
+      const localStored = parseStoredGroceryList(raw);
+      let restored: GroceryItem[] = localStored.map(storedToGroceryItem);
 
-        if (user?.id) {
-          try {
-            const remote = await groceryItemsService.getItems();
-            if (remote.length > 0) {
-              restored = remote.map(storedToGroceryItem);
-            } else if (localStored.length > 0) {
-              await groceryItemsService.replaceAll(localStored);
-            }
-          } catch (e) {
-            console.warn("Failed to load grocery list from cloud", e);
+      if (user?.id) {
+        try {
+          const remote = await groceryItemsService.getItems();
+          if (remote.length > 0) {
+            restored = remote.map(storedToGroceryItem);
+          } else if (localStored.length > 0) {
+            await groceryItemsService.replaceAll(localStored);
           }
-        }
-
-        if (!cancelled) {
-          skipPersistRef.current = true;
-          setShoppingList(restored);
-          listHydratedRef.current = true;
-        }
-      } catch (e) {
-        console.warn("Failed to load shopping list", e);
-        if (!cancelled) {
-          listHydratedRef.current = true;
-        }
-      } finally {
-        if (!cancelled) {
-          setInitialLoading(false);
+        } catch (e) {
+          console.warn("Failed to load grocery list from cloud", e);
         }
       }
-    })();
 
+      if (!isCancelled()) {
+        skipPersistRef.current = true;
+        setShoppingList(restored);
+        listHydratedRef.current = true;
+      }
+    } catch (e) {
+      console.warn("Failed to load shopping list", e);
+      if (!isCancelled()) {
+        listHydratedRef.current = true;
+      }
+    }
+  }, [user?.id]);
+
+  // Load saved list (cloud when signed in, else local). Avoid persisting [] before hydrate.
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      loadShoppingListData(() => cancelled).finally(() => {
+        if (!cancelled) setInitialLoading(false);
+      });
     return () => {
       cancelled = true;
     };
-  }, [user?.id]);
+    }, [loadShoppingListData])
+  );
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadShoppingListData();
+    setRefreshing(false);
+  }, [loadShoppingListData]);
 
   // Persist list after hydration (local always; cloud when signed in)
   useEffect(() => {
@@ -1492,7 +1494,8 @@ const styles = StyleSheet.create({
   modalCardScroll: {
     width: "100%",
     maxWidth: 420,
-    maxHeight: "88%",
+    maxHeight: "78%",
+    flexGrow: 0,
     borderRadius: 20,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
