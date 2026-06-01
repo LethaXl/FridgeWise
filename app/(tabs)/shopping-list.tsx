@@ -56,10 +56,16 @@ interface GroceryItem {
   notes?: string;
 }
 
+type GroceryCategoryGroup = {
+  id: string;
+  category: string;
+  items: GroceryItem[];
+};
+
 type GrocerySection = {
   title: string;
   kind: "category" | "purchased";
-  data: GroceryItem[];
+  data: GroceryCategoryGroup[];
 };
 
 const CATEGORY_OPTIONS = GROCERY_CATEGORY_OPTIONS;
@@ -308,17 +314,15 @@ export default function ShoppingListScreen() {
     </View>
   );
 
-  const renderGroceryItem = ({ item, index, section }: any) => {
-    // For category sections, render one grouped card per category with items stacked
+  const renderGroceryItem = ({ item, section }: any) => {
     if (section.kind === "category") {
-      if (index !== 0) return null;
-
+      const group = item as GroceryCategoryGroup;
       const categoryMeta = CATEGORY_OPTIONS.find(
-        (c) => c.label === section.title
+        (c) => c.label === group.category
       );
       const CategoryIcon = categoryMeta?.Icon;
-      const itemCount = section.data.length;
-      const collapsed = collapsedCategories[section.title];
+      const itemCount = group.items.length;
+      const collapsed = collapsedCategories[group.category];
 
       return (
         <View style={styles.categoryGroupCard}>
@@ -329,28 +333,28 @@ export default function ShoppingListScreen() {
               animateListChange();
               setCollapsedCategories((prev) => ({
                 ...prev,
-                [section.title]: !prev[section.title],
+                [group.category]: !prev[group.category],
               }));
             }}
           >
             {CategoryIcon && (
               <CategoryIcon size={16} color="#FFFFFF" weight="fill" />
             )}
-            <Text style={styles.categoryGroupTitle}>{section.title}</Text>
+            <Text style={styles.categoryGroupTitle}>{group.category}</Text>
             <View style={styles.categoryCountBadge}>
               <Text style={styles.categoryCountText}>{itemCount}</Text>
             </View>
           </TouchableOpacity>
           {!collapsed && (
             <View style={styles.categoryGroupBody}>
-              {section.data.map((sectionItem: GroceryItem, index: number) => {
+              {group.items.map((sectionItem: GroceryItem, index: number) => {
                 const meta = formatQuantityWithUnit(
                   sectionItem.quantity,
                   sectionItem.unit,
                   { fallbackUnit: "pcs" }
                 );
                 const muted = sectionItem.completed;
-                const isLast = index === section.data.length - 1;
+                const isLast = index === group.items.length - 1;
                 return (
                   <View
                     key={sectionItem.id}
@@ -594,7 +598,13 @@ export default function ShoppingListScreen() {
     return orderedCats.map((cat) => ({
       title: cat,
       kind: "category",
-      data: byCategory.get(cat) || [],
+      data: [
+        {
+          id: `category-${cat}`,
+          category: cat,
+          items: byCategory.get(cat) || [],
+        },
+      ],
     }));
   }, [shoppingList]);
 
