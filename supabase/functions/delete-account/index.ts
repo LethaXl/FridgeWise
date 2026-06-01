@@ -62,6 +62,7 @@ Deno.serve(async (req: Request) => {
 
     // Best-effort cleanup (app purges first; this covers partial failures).
     await admin.from("usage_logs").delete().eq("user_id", user.id);
+    await admin.from("grocery_items").delete().eq("user_id", user.id);
     await admin.from("food_items").delete().eq("user_id", user.id);
     await admin.from("user_profiles").delete().eq("id", user.id);
 

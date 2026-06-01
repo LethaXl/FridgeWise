@@ -46,3 +46,19 @@ export async function loadFullShoppingListRaw(): Promise<StoredGroceryItem[]> {
 export async function saveShoppingListRaw(items: StoredGroceryItem[]): Promise<void> {
   await AsyncStorage.setItem(SHOPPING_LIST_STORAGE_KEY, JSON.stringify(items));
 }
+
+export function parseStoredGroceryList(raw: string | null): StoredGroceryItem[] {
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw) as StoredGroceryItem[];
+  } catch {
+    return [];
+  }
+}
+
+export function newGroceryItemId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `grocery-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}

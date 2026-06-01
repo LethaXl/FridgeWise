@@ -283,6 +283,22 @@ export interface UsageLog {
   created_at: string;
 }
 
+export interface GroceryItemRow {
+  id: string;
+  user_id: string;
+  name: string;
+  category?: string | null;
+  quantity: number;
+  unit?: string | null;
+  status: "list" | "bought" | "fridge";
+  priority?: "high" | "medium" | "low" | null;
+  completed: boolean;
+  notes?: string | null;
+  added_date?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Notification {
   id: string;
   user_id: string;

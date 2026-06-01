@@ -7,7 +7,14 @@ import SkeletonBlock from "@/components/SkeletonBlock";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useAuth } from "@/contexts/AuthContext";
-import { SHOPPING_LIST_STORAGE_KEY } from "@/services/groceryListStorage";
+import {
+  newGroceryItemId,
+  parseStoredGroceryList,
+  saveShoppingListRaw,
+  SHOPPING_LIST_STORAGE_KEY,
+  type StoredGroceryItem,
+} from "@/services/groceryListStorage";
+import { groceryItemsService } from "@/services/groceryItemsService";
 import { GROCERY_CATEGORY_OPTIONS, GROCERY_CATEGORY_ORDER } from "@/lib/foodCategories";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -96,13 +103,46 @@ function grocerySheetQuantityValid(raw: string): boolean {
   return Number.isFinite(n) && n >= 1;
 }
 
+function storedToGroceryItem(it: StoredGroceryItem): GroceryItem {
+  const status: GroceryItem["status"] = it.status ?? "list";
+  return {
+    id: it.id,
+    name: it.name,
+    category: it.category,
+    quantity: it.quantity,
+    unit: it.unit,
+    status,
+    priority: it.priority ?? "medium",
+    completed: it.completed ?? status !== "list",
+    addedDate: it.addedDate ? new Date(it.addedDate) : new Date(),
+    notes: it.notes,
+  };
+}
+
+function groceryItemToStored(it: GroceryItem): StoredGroceryItem {
+  return {
+    id: it.id,
+    name: it.name,
+    category: it.category,
+    quantity: it.quantity,
+    unit: it.unit,
+    status: it.status,
+    priority: it.priority,
+    completed: it.completed,
+    addedDate: it.addedDate.toISOString(),
+    notes: it.notes,
+  };
+}
+
 // =============================================================================
 // MAIN COMPONENT
 // =============================================================================
 
 export default function ShoppingListScreen() {
-  useAuth();
+  const { user } = useAuth();
   const insets = useSafeAreaInsets();
+  const listHydratedRef = useRef(false);
+  const skipPersistRef = useRef(false);
   const [shoppingList, setShoppingList] = useState<GroceryItem[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -139,48 +179,72 @@ export default function ShoppingListScreen() {
     setRefreshing(false);
   }, []);
 
-  // Load saved list on mount
+  // Load saved list (cloud when signed in, else local). Avoid persisting [] before hydrate.
   useEffect(() => {
+    let cancelled = false;
+    listHydratedRef.current = false;
+
     (async () => {
       try {
         const raw = await AsyncStorage.getItem(SHOPPING_LIST_STORAGE_KEY);
-        if (!raw) return;
-        const parsed: any[] = JSON.parse(raw);
-        const restored: GroceryItem[] = parsed.map((it) => {
-          const status: GroceryItem["status"] = it.status ?? "list";
-          return {
-            ...it,
-            status,
-            completed: status !== "list",
-            addedDate: it.addedDate ? new Date(it.addedDate) : new Date(),
-          };
-        });
-        setShoppingList(restored);
+        const localStored = parseStoredGroceryList(raw);
+        let restored: GroceryItem[] = localStored.map(storedToGroceryItem);
+
+        if (user?.id) {
+          try {
+            const remote = await groceryItemsService.getItems();
+            if (remote.length > 0) {
+              restored = remote.map(storedToGroceryItem);
+            } else if (localStored.length > 0) {
+              await groceryItemsService.replaceAll(localStored);
+            }
+          } catch (e) {
+            console.warn("Failed to load grocery list from cloud", e);
+          }
+        }
+
+        if (!cancelled) {
+          skipPersistRef.current = true;
+          setShoppingList(restored);
+          listHydratedRef.current = true;
+        }
       } catch (e) {
         console.warn("Failed to load shopping list", e);
+        if (!cancelled) {
+          listHydratedRef.current = true;
+        }
       } finally {
-        setInitialLoading(false);
+        if (!cancelled) {
+          setInitialLoading(false);
+        }
       }
     })();
-  }, []);
 
-  // Persist list whenever it changes
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  // Persist list after hydration (local always; cloud when signed in)
   useEffect(() => {
+    if (!listHydratedRef.current) return;
+    if (skipPersistRef.current) {
+      skipPersistRef.current = false;
+      return;
+    }
+
+    const stored = shoppingList.map(groceryItemToStored);
     (async () => {
       try {
-        const toStore = shoppingList.map((it) => ({
-          ...it,
-          addedDate: it.addedDate.toISOString(),
-        }));
-        await AsyncStorage.setItem(
-          SHOPPING_LIST_STORAGE_KEY,
-          JSON.stringify(toStore)
-        );
+        await saveShoppingListRaw(stored);
+        if (user?.id) {
+          await groceryItemsService.replaceAll(stored);
+        }
       } catch (e) {
         console.warn("Failed to save shopping list", e);
       }
     })();
-  }, [shoppingList]);
+  }, [shoppingList, user?.id]);
 
   // =============================================================================
   // ACTIONS
@@ -247,7 +311,7 @@ export default function ShoppingListScreen() {
       );
     } else {
       const item: GroceryItem = {
-        id: `manual-${Date.now()}`,
+        id: newGroceryItemId(),
         name,
         category: draftCategory,
         quantity: safeQty,
@@ -728,8 +792,14 @@ export default function ShoppingListScreen() {
               }}
             />
 
-            {/* Single centered "square" popup */}
-            <View style={styles.modalCard}>
+            {/* Single centered popup — scrollable so all categories are reachable */}
+            <ScrollView
+              style={styles.modalCardScroll}
+              contentContainerStyle={styles.modalCard}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator
+              bounces={false}
+            >
               {unitOpen && (
                 <TouchableOpacity
                   activeOpacity={1}
@@ -960,7 +1030,7 @@ export default function ShoppingListScreen() {
                   <Text style={styles.sheetAddText}>Add</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </ScrollView>
           </View>
         </Modal>
       </ThemedView>
@@ -1419,14 +1489,12 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
-  modalCard: {
+  modalCardScroll: {
     width: "100%",
     maxWidth: 420,
+    maxHeight: "88%",
     borderRadius: 20,
     backgroundColor: "#FFFFFF",
-    paddingHorizontal: 14,
-    paddingTop: 14,
-    paddingBottom: 14,
     borderWidth: 1,
     borderColor: "#E5E7EB",
     shadowColor: "#000",
@@ -1434,6 +1502,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 18,
     elevation: 6,
+  },
+  modalCard: {
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    paddingBottom: 14,
   },
   sheetCard: {
     marginHorizontal: 16,

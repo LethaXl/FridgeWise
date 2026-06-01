@@ -51,6 +51,7 @@ export async function purgeUserRemoteData(userId: string): Promise<void> {
   // Only tables that exist in this project’s Supabase schema. Optional tables are skipped on error.
   const tablesInOrder = [
     { name: "usage_logs", column: "user_id" as const },
+    { name: "grocery_items", column: "user_id" as const },
     { name: "food_items", column: "user_id" as const },
   ];
 
