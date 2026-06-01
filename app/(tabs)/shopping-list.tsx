@@ -27,7 +27,6 @@ import {
   Pressable,
   RefreshControl,
   ScrollView,
-  SectionList,
   StyleSheet,
   Text,
   TextInput,
@@ -695,14 +694,10 @@ export default function ShoppingListScreen() {
           <ThemedText style={styles.bannerTitle}>Groceries</ThemedText>
         </View>
 
-        <SectionList
-          sections={sections}
-          keyExtractor={(item) => item.id}
-          renderItem={renderGroceryItem}
-          stickySectionHeadersEnabled={false}
+        <ScrollView
+          style={styles.list}
           contentContainerStyle={[
             styles.listContainer,
-            // ensure last items scroll above sticky bottom button + tab bar
             { paddingBottom: Math.min(insets.bottom + 160, 200) },
           ]}
           showsVerticalScrollIndicator={false}
@@ -713,15 +708,9 @@ export default function ShoppingListScreen() {
               tintColor={deepGreen}
             />
           }
-          ListHeaderComponent={
-            <>
-              {/* Simple centered Add button */}
-              <View style={styles.addButtonSpacer} />
-            </>
-          }
-          renderSectionHeader={() => null}
-          ListEmptyComponent={
-            initialLoading ? (
+        >
+          <View style={styles.addButtonSpacer} />
+          {initialLoading ? (
               <View style={styles.loadingSkeletonWrap}>
                 <View style={styles.loadingSkeletonCard}>
                   <SkeletonBlock width="40%" height={16} />
@@ -736,7 +725,7 @@ export default function ShoppingListScreen() {
                   <SkeletonBlock width="58%" height={12} style={{ marginTop: 10 }} />
                 </View>
               </View>
-            ) : (
+          ) : sections.length === 0 ? (
               <View style={styles.emptyState}>
                 <View style={styles.emptyBox}>
                   <Text style={[styles.emptyText, { color: textColor }]}>
@@ -749,10 +738,18 @@ export default function ShoppingListScreen() {
                   </Text>
                 </View>
               </View>
-            )
-          }
-          ListFooterComponent={<View style={{ height: 24 }} />}
-        />
+          ) : (
+            sections.map((section) => (
+              <React.Fragment key={section.title}>
+                {renderGroceryItem({
+                  item: section.data[0],
+                  section,
+                })}
+              </React.Fragment>
+            ))
+          )}
+          <View style={{ height: 24 }} />
+        </ScrollView>
 
         {/* Bottom Add button (sticky over list) */}
         <View
@@ -1046,6 +1043,9 @@ export default function ShoppingListScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  list: {
     flex: 1,
   },
   listContainer: {
